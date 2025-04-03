@@ -70,39 +70,45 @@ h1 {
   width: 560px;
   height: 560px;
   margin: 0;
-  flex-shrink: 0;
+  filter: drop-shadow(0 0 20px rgba(126, 34, 206, 0.3));
+  border-radius: 8px;
 }
 
 .chess-board {
   width: 100%;
   height: 100%;
-  border: 12px solid #472d1c;
-  box-shadow: 0 0 20px rgba(142, 68, 173, 0.8);
+  border: 12px solid #281634;
+  border-radius: 6px;
+  box-shadow: 0 0 25px rgba(126, 34, 206, 0.3);
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
-  background: linear-gradient(
-    135deg,
-    #59442a 25%,
-    #453420 25%,
-    #453420 50%,
-    #59442a 50%,
-    #59442a 75%,
-    #453420 75%
-  );
-  background-size: 40px 40px;
   position: relative;
+  overflow: hidden;
 }
 
 .chess-board::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  right: -16px;
+  bottom: -16px;
+  background: linear-gradient(135deg, #2a1738, #3d1f4f);
+  border: 1px solid #4e2a60;
+  border-radius: 8px;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+  z-index: -1;
+}
+
+.chess-board::after {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="1" fill="rgba(142, 68, 173, 0.1)"/></svg>');
-  opacity: 0.5;
+  border: 1px solid rgba(240, 180, 41, 0.3);
   pointer-events: none;
 }
 
@@ -115,121 +121,83 @@ h1 {
   transition: all 0.2s ease;
 }
 
+.square::before {
+  display: none;
+}
+
 .square-light {
-  background-color: #e9d8b6;
+  background: #f5ecd6;
+  position: relative;
 }
 
 .square-dark {
-  background-color: #8a6642;
+  background: #9879b6;
+  position: relative;
 }
 
 .piece {
-  width: 85%;
-  height: 85%;
+  width: 80%;
+  height: 80%;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  transition: transform 0.3s ease;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
-  z-index: 2;
-}
-
-.square:hover .piece {
-  transform: scale(1.08);
-  filter: brightness(1.1) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.7));
+  transition: transform 0.2s ease;
   z-index: 5;
 }
 
+.square:hover .piece {
+  transform: scale(1.1);
+}
+
 .square.selected {
-  background-color: rgba(142, 68, 173, 0.5);
-  box-shadow: inset 0 0 15px rgba(243, 156, 18, 0.7);
+  box-shadow: inset 0 0 0 3px rgba(240, 180, 41, 0.8);
+  z-index: 2;
+}
+
+.square.selected::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(240, 180, 41, 0.6) 0%,
+    rgba(240, 180, 41, 0.2) 70%
+  );
+  z-index: 2;
   animation: pulse-selected 2s infinite;
+  box-shadow: inset 0 0 15px rgba(240, 180, 41, 0.6);
 }
 
 @keyframes pulse-selected {
   0% {
-    box-shadow: inset 0 0 15px rgba(243, 156, 18, 0.5);
+    opacity: 0.7;
+    box-shadow: inset 0 0 10px rgba(240, 180, 41, 0.4);
   }
   50% {
-    box-shadow: inset 0 0 25px rgba(243, 156, 18, 0.9);
+    opacity: 0.9;
+    box-shadow: inset 0 0 20px rgba(240, 180, 41, 0.8);
   }
   100% {
-    box-shadow: inset 0 0 15px rgba(243, 156, 18, 0.5);
+    opacity: 0.7;
+    box-shadow: inset 0 0 10px rgba(240, 180, 41, 0.4);
   }
 }
 
 .square.possible-move::after {
   content: "";
   position: absolute;
-  width: 30%;
-  height: 30%;
+  width: 25%;
+  height: 25%;
   border-radius: 50%;
-  background-color: rgba(142, 68, 173, 0.5);
-  box-shadow: 0 0 10px rgba(142, 68, 173, 0.5);
-  animation: pulse-move 1.5s infinite;
-  z-index: 1;
-}
-
-@keyframes pulse-move {
-  0% {
-    transform: scale(0.9);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(0.9);
-    opacity: 0.6;
-  }
-}
-
-.square.possible-capture::after {
-  content: "";
-  position: absolute;
-  width: 90%;
-  height: 90%;
-  border-radius: 50%;
-  border: 3px solid rgba(243, 156, 18, 0.6);
-  box-shadow: 0 0 10px rgba(243, 156, 18, 0.4);
-  animation: pulse-capture 1.5s infinite;
-  z-index: 1;
-}
-
-@keyframes pulse-capture {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.03);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(0.95);
-    opacity: 0.6;
-  }
+  background-color: rgba(240, 180, 41, 0.85);
+  z-index: 2;
 }
 
 .piece.moving {
-  animation: float 0.6s ease-in-out;
   z-index: 10;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0) scale(1);
-    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
-  }
-  50% {
-    transform: translateY(-10px) scale(1.1);
-    filter: drop-shadow(0 10px 15px rgba(142, 68, 173, 0.6));
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
-  }
 }
 
 .piece.capturing {
@@ -454,23 +422,99 @@ button:active {
 
 /* Add highlighting for last move */
 .last-move-from {
-  background-color: rgba(255, 215, 0, 0.2) !important;
-  box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.3);
+  background-color: rgba(240, 180, 41, 0.2) !important;
 }
 
 .last-move-to {
-  background-color: rgba(255, 215, 0, 0.3) !important;
-  box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.4);
+  background-color: rgba(240, 180, 41, 0.3) !important;
 }
 
-/* Improve visibility for black pieces on dark squares */
+/* White pieces with subtle drop shadow */
+[style*="w_"] {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+}
+
+/* Black pieces with cleaner, more defined outline */
+[style*="b_"] {
+  filter: 
+    /* Create thin white outline */ drop-shadow(0.5px 0 0 white)
+    drop-shadow(-0.5px 0 0 white) drop-shadow(0 0.5px 0 white)
+    drop-shadow(0 -0.5px 0 white) /* Subtle shadow for depth */
+    drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+}
+
+/* Extra clarity for black pieces on dark squares */
 .square-dark [style*="b_"] {
-  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7))
-    drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+  filter: 
+    /* More pronounced outline on dark squares */ drop-shadow(
+      0.75px 0 0 white
+    )
+    drop-shadow(-0.75px 0 0 white) drop-shadow(0 0.75px 0 white)
+    drop-shadow(0 -0.75px 0 white) /* Subtle shadow for depth */
+    drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
 }
 
-/* Fix for any black rook size inconsistency */
-[style*="b_rook.png"] {
-  background-size: 85% 85%;
-  background-position: center center;
+/* Simplified hover effect */
+.square:hover .piece {
+  transform: scale(1.1);
+}
+
+/* Clean selection highlighting */
+.square.selected::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(240, 180, 41, 0.6) 0%,
+    rgba(240, 180, 41, 0.2) 70%
+  );
+  z-index: 2;
+  animation: pulse-selected 2s infinite;
+  box-shadow: inset 0 0 15px rgba(240, 180, 41, 0.6);
+}
+
+@keyframes pulse-selected {
+  0% {
+    opacity: 0.7;
+    box-shadow: inset 0 0 10px rgba(240, 180, 41, 0.4);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: inset 0 0 20px rgba(240, 180, 41, 0.8);
+  }
+  100% {
+    opacity: 0.7;
+    box-shadow: inset 0 0 10px rgba(240, 180, 41, 0.4);
+  }
+}
+
+/* Simplified possible move indicator */
+.square.possible-move::after {
+  content: "";
+  position: absolute;
+  width: 25%;
+  height: 25%;
+  border-radius: 50%;
+  background-color: rgba(240, 180, 41, 0.85);
+  z-index: 2;
+}
+
+/* Simplified possible capture indicator */
+.square.possible-capture::after {
+  content: "";
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  border: 3px solid rgba(240, 180, 41, 0.85);
+  z-index: 2;
+}
+
+/* Clean animation for moving pieces */
+.piece.moving {
+  z-index: 10;
 }
