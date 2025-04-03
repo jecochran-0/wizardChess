@@ -15,6 +15,15 @@
       </header>
 
       <div class="game-area">
+        <div class="board-container">
+          <div id="board" class="chess-board"></div>
+          <div id="promotion-selection" class="hidden">
+            <div class="promotion-piece" data-piece="q"></div>
+            <div class="promotion-piece" data-piece="r"></div>
+            <div class="promotion-piece" data-piece="b"></div>
+            <div class="promotion-piece" data-piece="n"></div>
+          </div>
+        </div>
         <div class="side-panel">
           <div class="difficulty-selector">
             <h3>Bot Difficulty</h3>
@@ -43,16 +52,6 @@
             <button id="new-game">New Game</button>
             <button id="undo-move">Undo Move</button>
             <button id="hint">Hint</button>
-          </div>
-        </div>
-
-        <div class="board-container">
-          <div id="board" class="chess-board"></div>
-          <div id="promotion-selection" class="hidden">
-            <div class="promotion-piece" data-piece="q"></div>
-            <div class="promotion-piece" data-piece="r"></div>
-            <div class="promotion-piece" data-piece="b"></div>
-            <div class="promotion-piece" data-piece="n"></div>
           </div>
         </div>
       </div>
