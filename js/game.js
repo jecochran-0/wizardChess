@@ -233,6 +233,13 @@ class WizardChess {
       toSquare.classList.remove("possible-move");
       toSquare.classList.add("possible-capture");
     }
+
+    // Also mark it as the last move for consistent highlighting
+    if (typeof this.board.highlightLastMove === "function") {
+      setTimeout(() => {
+        this.board.highlightLastMove(move.from, move.to);
+      }, 600); // Apply after the animation
+    }
   }
 
   // Undo the player's last move

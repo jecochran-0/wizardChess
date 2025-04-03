@@ -197,6 +197,9 @@ class ChessBoard {
       return false;
     }
 
+    // Highlight the move that was just made
+    this.highlightLastMove(move.from, move.to);
+
     // Update the board immediately rather than waiting for animation
     this.clearSelection();
     this.render();
@@ -447,5 +450,26 @@ class ChessBoard {
     this.flipped = !this.flipped;
     this.createBoard();
     this.render();
+  }
+
+  // Add this method to ChessBoard class
+  highlightLastMove(from, to) {
+    // Remove previous highlights
+    document.querySelectorAll(".square").forEach((sq) => {
+      sq.classList.remove("last-move-from", "last-move-to");
+    });
+
+    if (!from || !to) return;
+
+    // Get the squares
+    const [fromRow, fromCol] = this.positionToRowCol(from);
+    const [toRow, toCol] = this.positionToRowCol(to);
+
+    const fromSquare = this.getSquareElement(fromRow, fromCol);
+    const toSquare = this.getSquareElement(toRow, toCol);
+
+    // Add highlighting classes
+    if (fromSquare) fromSquare.classList.add("last-move-from");
+    if (toSquare) toSquare.classList.add("last-move-to");
   }
 }
