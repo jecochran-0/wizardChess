@@ -435,12 +435,6 @@ h1 {
     drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
 }
 
-/* Simplified hover effect */
-.square:hover .piece {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 8px rgba(255, 152, 0, 0.7));
-}
-
 /* Clean selection highlighting */
 .square.selected::after {
   content: "";
@@ -754,11 +748,6 @@ h1 {
   background-color: rgba(40, 20, 60, 0.9);
   padding: 10px;
   transition: transform 0.3s ease;
-}
-
-/* Make board hover effect for extra interactivity */
-.board-container:hover {
-  transform: scale(1.01);
 }
 
 /* Chess Board Styling - Fix visibility issue */
