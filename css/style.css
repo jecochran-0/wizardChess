@@ -825,11 +825,6 @@ h1 {
   cursor: default;
   transition: none;
   transform: none !important;
-  /* Remove any potential white outline by adding a drop-shadow with the board color */
-  filter: drop-shadow(0px 0px 1px rgba(40, 22, 55, 0.3));
-  /* Ensure smooth rendering */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
 }
 
 /* Selected Square styling */
