@@ -203,8 +203,13 @@ class WizardChess {
     const move = this.engine.getBestMove();
 
     if (move) {
-      // Highlight the move
-      this.highlightBotMove(move);
+      // Get the piece color before making the move
+      const piece = this.getPiece(move.from);
+      const pieceColor = piece ? piece.color : null;
+
+      // Store these for applying the glow effect
+      this.board.lastMoveFrom = move.from;
+      this.board.lastPieceColor = pieceColor;
 
       // Make the move on the chess.js board
       this.move({
@@ -215,6 +220,12 @@ class WizardChess {
 
       // Update the board display
       setTimeout(() => {
+        // Clear previous glow of opposite color
+        this.board.clearOppositeGlow(pieceColor);
+
+        // Add glow to the source square
+        this.board.addGlowToLastMove();
+
         this.board.render();
         this.board.updateCapturedPieces();
         this.board.updateMoveHistory();

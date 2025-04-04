@@ -1203,3 +1203,36 @@ div[style*="color:red"],
 div[style*="color: red"] {
   display: none !important;
 }
+
+/* Glow effects for squares after piece movement */
+.white-moved-from {
+  box-shadow: inset 0 0 20px 10px rgba(255, 215, 0, 0.8) !important; /* Yellow glow */
+  z-index: 5 !important;
+}
+
+.black-moved-from {
+  box-shadow: inset 0 0 20px 10px rgba(128, 0, 128, 0.8) !important; /* Purple glow */
+  z-index: 5 !important;
+}
+
+/* Override any box-shadow restrictions for these specific classes */
+.white-moved-from,
+.black-moved-from,
+#board .white-moved-from,
+#board .black-moved-from {
+  position: relative !important;
+}
+
+/* Override box-shadow restrictions for glow classes */
+.square.white-moved-from,
+.square.black-moved-from,
+#board .square.white-moved-from,
+#board .square.black-moved-from {
+  box-shadow: inset 0 0 20px 10px rgba(255, 215, 0, 0.8) !important; /* Default to yellow */
+}
+
+/* Specific override for black pieces */
+.square.black-moved-from,
+#board .square.black-moved-from {
+  box-shadow: inset 0 0 20px 10px rgba(128, 0, 128, 0.8) !important; /* Purple */
+}

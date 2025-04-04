@@ -8,6 +8,8 @@ class ChessBoard {
     this.selectedSquare = null;
     this.possibleMoves = [];
     this.flipped = false;
+    this.lastMoveFrom = null; // Track the last move's source square
+    this.lastPieceColor = null; // Track the color of the last moved piece
     this.pieceImages = {
       wP: "w_pawn.png",
       wR: "w_rook.png",
@@ -281,29 +283,44 @@ class ChessBoard {
     // Don't visualize any move animations or highlights
     this.clearSelection(); // Clear any highlights first
 
+    // Get the piece color before making the move
+    const piece = this.game.getPiece(move.from);
+    const pieceColor = piece ? piece.color : null;
+
+    // Store these for updating the glow
+    this.lastMoveFrom = move.from;
+    this.lastPieceColor = pieceColor;
+
     // Make the move in the game logic
     const result = this.game.makeMove(move);
 
     if (result) {
+      // Clear previous glow of opposite color
+      this.clearOppositeGlow(pieceColor);
+
+      // Add glow to the source square
+      this.addGlowToLastMove();
+
       // Just update the board state - no animations or highlights
       this.render();
+
+      // Update the captured pieces display
       this.updateCapturedPieces();
+
+      // Update the move history display
       this.updateMoveHistory();
 
-      // Check for game over
-      if (this.game.isGameOver()) {
-        this.showGameOverMessage();
-        return;
-      }
-
-      // If playing against computer, make the bot move
+      // If playing against computer, make the bot move after a short delay
       if (
         this.game.gameMode === "computer" &&
-        this.game.turn() !== this.game.playerColor
+        !this.game.isPlayerTurn() &&
+        !this.game.isGameOver()
       ) {
         setTimeout(() => this.game.makeBotMove(), 300);
       }
     }
+
+    return result;
   }
 
   // Updated showPromotionDialog to use correct image paths
@@ -757,8 +774,17 @@ class ChessBoard {
         ) {
           const element = mutation.target;
           if (element.classList.contains("square")) {
-            // Remove highlight classes but keep structural classes
-            const classesToKeep = ["square", "square-light", "square-dark"];
+            // Remove highlight classes but keep structural classes and our glow classes
+            const classesToKeep = [
+              "square",
+              "square-light",
+              "square-dark",
+              "white-moved-from", // Keep our white glow class
+              "black-moved-from", // Keep our black glow class
+              "possible-move", // Keep movement indicators
+              "possible-capture", // Keep capture indicators
+            ];
+
             Array.from(element.classList).forEach((cls) => {
               if (!classesToKeep.includes(cls)) {
                 element.classList.remove(cls);
@@ -832,6 +858,36 @@ class ChessBoard {
       .forEach((square) => {
         square.classList.remove("possible-move", "possible-capture");
       });
+  }
+
+  // Add these new methods to handle the glow effects
+  addGlowToLastMove() {
+    if (!this.lastMoveFrom || !this.lastPieceColor) return;
+
+    // Get the source square element
+    const [fromRow, fromCol] = this.positionToRowCol(this.lastMoveFrom);
+    const fromSquare = this.getSquareElement(fromRow, fromCol);
+
+    if (fromSquare) {
+      // Remove any existing glow classes
+      fromSquare.classList.remove("white-moved-from", "black-moved-from");
+
+      // Add the appropriate glow class based on piece color
+      if (this.lastPieceColor === "w") {
+        fromSquare.classList.add("white-moved-from");
+      } else {
+        fromSquare.classList.add("black-moved-from");
+      }
+    }
+  }
+
+  clearOppositeGlow(currentColor) {
+    // Remove glow of the opposite color
+    const oppositeClass =
+      currentColor === "w" ? "black-moved-from" : "white-moved-from";
+    document.querySelectorAll(`.${oppositeClass}`).forEach((square) => {
+      square.classList.remove(oppositeClass);
+    });
   }
 }
 
