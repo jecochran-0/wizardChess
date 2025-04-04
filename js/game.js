@@ -46,18 +46,15 @@ class WizardChess {
 
   // Display error message to user
   displayError(message) {
-    const gameContainer = document.querySelector(".game-container");
-    if (gameContainer) {
-      const errorDiv = document.createElement("div");
-      errorDiv.className = "error-message";
-      errorDiv.textContent = message;
-      errorDiv.style.color = "red";
-      errorDiv.style.padding = "20px";
-      errorDiv.style.textAlign = "center";
-      gameContainer.prepend(errorDiv);
-    } else {
-      alert(message);
-    }
+    // Only log to console, don't show any UI elements
+    console.error("Game initialization error:", message);
+
+    // Remove any existing error messages that might be present
+    const errorElements = document.querySelectorAll(".error-message");
+    errorElements.forEach((el) => {
+      el.style.display = "none";
+      el.remove();
+    });
   }
 
   // Initialize the game

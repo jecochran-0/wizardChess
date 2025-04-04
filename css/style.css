@@ -1184,3 +1184,21 @@ h1 {
 .square {
   transition: none !important;
 }
+
+/* Hide any error messages */
+.error-message {
+  display: none !important;
+}
+
+/* Additional style to hide the error at the top */
+body > div[style*="color: red"],
+body > div.error-message,
+div.game-container > div.error-message {
+  display: none !important;
+}
+
+/* Also hide any elements with inline styles that look like error messages */
+div[style*="color:red"],
+div[style*="color: red"] {
+  display: none !important;
+}
