@@ -219,6 +219,9 @@ class ChessBoard {
       setTimeout(() => this.game.makeBotMove(), 500);
     }
 
+    // Add some magical effects to the board when moves are made
+    addMagicalEffect(this.getSquareElement(move.to[0], move.to[1]));
+
     return true;
   }
 
@@ -472,4 +475,17 @@ class ChessBoard {
     if (fromSquare) fromSquare.classList.add("last-move-from");
     if (toSquare) toSquare.classList.add("last-move-to");
   }
+}
+
+// Add some magical effects to the board when moves are made
+function addMagicalEffect(square) {
+  // Create a magical effect element
+  const effect = document.createElement("div");
+  effect.classList.add("magical-effect");
+  square.appendChild(effect);
+
+  // Remove the effect after animation completes
+  setTimeout(() => {
+    effect.remove();
+  }, 1000);
 }

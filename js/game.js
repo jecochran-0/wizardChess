@@ -513,3 +513,82 @@ if (!window.game) window.game = {};
 
   // You may need to adapt other existing functions to respect the game mode
 })(window.game);
+
+// We need to remove the createGameSparkles function and its calls
+// The following code will replace the existing sparkle implementation with code that
+// just removes any existing sparkles and doesn't create new ones
+
+function removeGameSparkles() {
+  const gameContainer = document.getElementById("game-container");
+  if (!gameContainer) return;
+
+  // Remove any existing sparkles
+  const existingSparkles = gameContainer.querySelectorAll(".game-sparkle");
+  existingSparkles.forEach((sparkle) => sparkle.remove());
+}
+
+// Replace the DOMContentLoaded event listener that adds sparkles
+document.addEventListener("DOMContentLoaded", function () {
+  // Just remove any sparkles that might exist
+  removeGameSparkles();
+
+  // No need to add sparkles when switching to game view
+  // We'll just clean up the event listeners to be safe
+  const playButtons = document.querySelectorAll("#play-computer, #play-local");
+  playButtons.forEach((button) => {
+    // Remove any existing click handlers that might add sparkles
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+
+    // Add back the original game functionality without sparkles
+    newButton.addEventListener("click", function () {
+      const mainMenu = document.getElementById("main-menu");
+      const gameContainer = document.getElementById("game-container");
+
+      if (mainMenu) mainMenu.style.display = "none";
+      if (gameContainer) gameContainer.style.display = "block";
+
+      // Clean up any sparkles
+      removeGameSparkles();
+    });
+  });
+});
+
+// Add this to your existing DOMContentLoaded event listener
+document.addEventListener("DOMContentLoaded", function () {
+  // Create background image for game container
+  function addGameBackground() {
+    const gameContainer = document.getElementById("game-container");
+
+    // Remove any existing background
+    const existingBackground = gameContainer.querySelector(".game-background");
+    if (existingBackground) existingBackground.remove();
+
+    // Create new background element
+    const background = document.createElement("div");
+    background.className = "game-background";
+
+    // Set inline styles for guaranteed display
+    background.style.position = "absolute";
+    background.style.top = "0";
+    background.style.left = "0";
+    background.style.width = "100%";
+    background.style.height = "100%";
+    background.style.backgroundImage = "url('mainMenuBackground.png')";
+    background.style.backgroundSize = "cover";
+    background.style.backgroundPosition = "center";
+    background.style.opacity = "0.6";
+    background.style.zIndex = "1";
+
+    // Insert as first child
+    gameContainer.insertBefore(background, gameContainer.firstChild);
+  }
+
+  // Call when game is shown
+  const playButtons = document.querySelectorAll("#play-computer, #play-local");
+  playButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      setTimeout(addGameBackground, 50); // Short delay to ensure container is visible
+    });
+  });
+});

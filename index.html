@@ -45,6 +45,21 @@
 
     <!-- Game Container (hidden initially) -->
     <div class="game-container" id="game-container" style="display: none">
+      <div
+        class="game-background"
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('mainMenuBackground.png');
+          background-size: cover;
+          background-position: center;
+          opacity: 0.6;
+          z-index: 1;
+        "
+      ></div>
       <div class="game-area">
         <div class="board-container">
           <div id="board" class="chess-board"></div>
@@ -80,10 +95,14 @@
           </div>
 
           <div class="game-controls">
-            <button id="new-game">New Game</button>
-            <button id="undo-move">Undo Move</button>
-            <button id="hint">Hint</button>
-            <button id="return-to-menu">Main Menu</button>
+            <button id="new-game"><i class="fas fa-magic"></i> New Game</button>
+            <button id="undo-move">
+              <i class="fas fa-undo"></i> Undo Move
+            </button>
+            <button id="hint"><i class="fas fa-lightbulb"></i> Hint</button>
+            <button id="return-to-menu">
+              <i class="fas fa-home"></i> Main Menu
+            </button>
           </div>
         </div>
       </div>
