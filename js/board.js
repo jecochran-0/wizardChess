@@ -585,6 +585,9 @@ class ChessBoard {
           }
         }
       }
+
+      // Update the turn indicator after rendering the board
+      this.updateTurnIndicator();
     } catch (error) {
       console.error("Error rendering board:", error);
     }
@@ -732,6 +735,26 @@ class ChessBoard {
     console.log(
       `Board orientation set to ${this.flipped ? "Black" : "White"} perspective`
     );
+  }
+
+  // Add a new method to update the turn indicator
+  updateTurnIndicator() {
+    const statusElement = document.getElementById("game-status");
+    if (statusElement) {
+      if (this.game.isGameOver()) {
+        if (this.game.inCheckmate()) {
+          const winner = this.game.turn() === "w" ? "Black" : "White";
+          statusElement.textContent = `${winner} wins by checkmate`;
+        } else if (this.game.inDraw()) {
+          statusElement.textContent = "Game ended in draw";
+        } else {
+          statusElement.textContent = "Game over";
+        }
+      } else {
+        const currentTurn = this.game.turn() === "w" ? "White" : "Black";
+        statusElement.textContent = `${currentTurn} to move`;
+      }
+    }
   }
 }
 
