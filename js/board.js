@@ -46,6 +46,9 @@ class ChessBoard {
 
       this.render();
       console.log("Board initialized successfully");
+
+      // Add MutationObserver to remove any highlights that might be added
+      this.setupHighlightBlocker();
     } catch (error) {
       console.error("Error initializing board:", error);
     }
@@ -157,72 +160,53 @@ class ChessBoard {
 
   // Render the current selection and possible moves
   renderSelection() {
-    if (!this.selectedSquare) return;
-
-    // Highlight selected square
-    const [selectedRow, selectedCol] = this.positionToRowCol(
-      this.selectedSquare
-    );
-    const selectedElement = this.getSquareElement(selectedRow, selectedCol);
-    selectedElement.classList.add("selected");
-
-    // Highlight possible moves
-    this.possibleMoves.forEach((move) => {
-      const [row, col] = this.positionToRowCol(move.to);
-      const squareElement = this.getSquareElement(row, col);
-
-      if (move.flags.includes("c") || move.flags.includes("e")) {
-        squareElement.classList.add("possible-capture");
-      } else {
-        squareElement.classList.add("possible-move");
-      }
-    });
+    // Do nothing - don't display any move indicators
+    return;
   }
 
   // Make a move on the board
   makeMove(move) {
-    // Get the piece that moved
-    const piece = this.game.getPiece(move.from);
+    // Reset all state
+    this.selectedSquare = null;
+    this.possibleMoves = [];
+    this.clearAllHighlights(); // New method to clear everything
 
-    // Apply the move to the game
-    const moveResult = this.game.move({
-      from: move.from,
-      to: move.to,
-      promotion: move.promotion,
-    });
+    try {
+      const moveResult = this.game.move({
+        from: move.from,
+        to: move.to,
+        promotion: move.promotion,
+      });
 
-    // Don't proceed if the move was invalid
-    if (!moveResult) {
-      console.error("Invalid move:", move);
-      return false;
+      if (!moveResult) return false;
+
+      // Update board without ANY highlight effects
+      this.render();
+      this.updateCapturedPieces();
+      this.updateMoveHistory();
+
+      // Remove any highlights that might have been added
+      this.clearAllHighlights();
+
+      // Game state checks
+      if (this.game.isGameOver()) {
+        this.showGameOverMessage();
+      } else if (!this.game.isPlayerTurn()) {
+        // When AI is about to move, ensure board is clean
+        this.clearAllHighlights();
+        setTimeout(() => {
+          this.game.makeBotMove();
+          // Clean up again after AI moves
+          this.clearAllHighlights();
+        }, 500);
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Move error:", error);
+      this.render();
+      return true;
     }
-
-    // Highlight the move that was just made
-    this.highlightLastMove(move.from, move.to);
-
-    // Update the board immediately rather than waiting for animation
-    this.clearSelection();
-    this.render();
-    this.updateCapturedPieces();
-    this.updateMoveHistory();
-
-    // Check game state - be very explicit with the check
-    if (
-      this.game.chess &&
-      this.game.chess.game_over &&
-      this.game.chess.game_over()
-    ) {
-      console.log("Game over detected after move");
-      this.showGameOverMessage();
-    } else if (!this.game.isPlayerTurn()) {
-      // If it's the computer's turn now, make a move after a delay
-      setTimeout(() => this.game.makeBotMove(), 500);
-    }
-
-    // Add some magical effects to the board when moves are made
-    addMagicalEffect(this.getSquareElement(move.to[0], move.to[1]));
-
-    return true;
   }
 
   // Show promotion dialog
@@ -457,35 +441,84 @@ class ChessBoard {
 
   // Add this method to ChessBoard class
   highlightLastMove(from, to) {
-    // Remove previous highlights
-    document.querySelectorAll(".square").forEach((sq) => {
-      sq.classList.remove("last-move-from", "last-move-to");
+    // Do nothing - no move highlighting
+    return;
+  }
+
+  // Add a more thorough highlight clearing method
+  clearAllHighlights() {
+    // Get ALL squares
+    const allSquares = document.querySelectorAll(".square");
+
+    // Remove every possible class that could cause highlighting
+    allSquares.forEach((square) => {
+      square.classList.remove(
+        "selected",
+        "possible-move",
+        "possible-capture",
+        "last-move-from",
+        "last-move-to",
+        "check",
+        "highlight",
+        "active",
+        "hover",
+        "animated"
+      );
+
+      // Also remove any added elements that might be for effects
+      Array.from(square.children).forEach((child) => {
+        if (child.classList.contains("piece")) return; // Keep pieces
+        child.remove();
+      });
+    });
+  }
+
+  // Add new method to set up MutationObserver
+  setupHighlightBlocker() {
+    // Create an observer to detect and remove highlight classes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        // If classes were added
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "class"
+        ) {
+          const element = mutation.target;
+          if (element.classList.contains("square")) {
+            // Remove highlight classes but keep structural classes
+            const classesToKeep = ["square", "square-light", "square-dark"];
+            Array.from(element.classList).forEach((cls) => {
+              if (!classesToKeep.includes(cls)) {
+                element.classList.remove(cls);
+              }
+            });
+          }
+        }
+
+        // If elements were added (like effect divs)
+        if (mutation.type === "childList") {
+          Array.from(mutation.addedNodes).forEach((node) => {
+            if (node.nodeType === 1 && !node.classList.contains("piece")) {
+              // Remove any non-piece elements
+              node.remove();
+            }
+          });
+        }
+      });
     });
 
-    if (!from || !to) return;
-
-    // Get the squares
-    const [fromRow, fromCol] = this.positionToRowCol(from);
-    const [toRow, toCol] = this.positionToRowCol(to);
-
-    const fromSquare = this.getSquareElement(fromRow, fromCol);
-    const toSquare = this.getSquareElement(toRow, toCol);
-
-    // Add highlighting classes
-    if (fromSquare) fromSquare.classList.add("last-move-from");
-    if (toSquare) toSquare.classList.add("last-move-to");
+    // Observe the entire board for class changes and child additions
+    observer.observe(this.containerElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+      childList: true,
+      subtree: true,
+    });
   }
 }
 
-// Add some magical effects to the board when moves are made
+// Empty the addMagicalEffect function
 function addMagicalEffect(square) {
-  // Create a magical effect element
-  const effect = document.createElement("div");
-  effect.classList.add("magical-effect");
-  square.appendChild(effect);
-
-  // Remove the effect after animation completes
-  setTimeout(() => {
-    effect.remove();
-  }, 1000);
+  // Do nothing - no effects
+  return;
 }

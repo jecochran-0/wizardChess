@@ -788,11 +788,11 @@ h1 {
 }
 
 .square-light {
-  background-color: #f3e6c6; /* Warmer light square */
+  background-color: #f3e6c6 !important;
 }
 
 .square-dark {
-  background-color: #8d65c5; /* Purpler dark square */
+  background-color: #8d65c5 !important;
 }
 
 /* Piece Styling - Make sure pieces are visible */
@@ -802,9 +802,10 @@ h1 {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  z-index: 2;
-  transition: all 0.2s ease;
-  cursor: pointer;
+  z-index: 10;
+  cursor: default;
+  transition: none;
+  transform: none !important;
 }
 
 /* Selected Square styling */
@@ -813,40 +814,26 @@ h1 {
 }
 
 .square.selected::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 167, 38, 0.4);
-  z-index: 1;
-  box-shadow: inset 0 0 10px rgba(255, 167, 38, 0.6);
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* Possible move styling */
 .square.possible-move::before {
-  content: "";
-  position: absolute;
-  width: 30%;
-  height: 30%;
-  border-radius: 50%;
-  background-color: rgba(255, 167, 38, 0.6);
-  z-index: 1;
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* Possible capture styling */
 .square.possible-capture::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 4px solid rgba(255, 97, 97, 0.7);
-  border-radius: 0;
-  box-sizing: border-box;
-  z-index: 1;
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* Highlight last move */
@@ -857,12 +844,19 @@ h1 {
 
 .square.last-move-from::after,
 .square.last-move-to::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 215, 0, 0.3);
-  z-index: 1;
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Remove all classes that cause highlighting */
+.last-move-from,
+.last-move-to,
+.selected,
+.possible-move,
+.possible-capture {
+  background-color: inherit !important;
+  box-shadow: none !important;
+  border: none !important;
 }
