@@ -1123,3 +1123,64 @@ h1 {
 #board.flipped .square-label {
   /* Remove transform: rotate(180deg); */
 }
+
+/* Prevent any board color changes or indicators */
+.square.selected,
+.square.possible-move,
+.square.possible-capture,
+.square.last-move-from,
+.square.last-move-to,
+.square:hover {
+  /* Override any highlighting styles */
+  background-color: inherit !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Ensure no indicators are displayed */
+.square::before,
+.square::after {
+  display: none !important;
+}
+
+/* More aggressive style overrides for squares */
+.square,
+.square:hover,
+.square:active,
+.square:focus,
+.square.selected,
+.square.possible-move,
+.square.possible-capture,
+.square.last-move-from,
+.square.last-move-to,
+#board .square,
+#board .square:hover {
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Force square colors to remain constant */
+.square-light,
+.square-light:hover,
+.square-light.selected,
+.square-light.possible-move,
+#board .square-light,
+#board .square-light:hover {
+  background-color: #f0d9b5 !important; /* Light square color */
+}
+
+.square-dark,
+.square-dark:hover,
+.square-dark.selected,
+.square-dark.possible-move,
+#board .square-dark,
+#board .square-dark:hover {
+  background-color: #b58863 !important; /* Dark square color */
+}
+
+/* Additional override to prevent any transitions */
+.square {
+  transition: none !important;
+}

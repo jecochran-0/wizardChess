@@ -78,6 +78,22 @@ class ChessBoard {
             (visualRow + visualCol) % 2 === 0 ? "square-light" : "square-dark"
           }`;
 
+          // Disable hover and selection effects with inline styles for maximum override
+          square.style.transition = "none";
+          square.style.pointerEvents = "auto"; // Keep clickable
+          square.style.cursor = "pointer"; // Keep pointer cursor
+
+          // Permanently set the background color
+          const isLight = (visualRow + visualCol) % 2 === 0;
+          square.style.backgroundColor = isLight ? "#f0d9b5" : "#b58863";
+
+          // Prevent highlighting even when hovering
+          square.addEventListener("mouseover", (e) => {
+            e.currentTarget.style.backgroundColor = isLight
+              ? "#f0d9b5"
+              : "#b58863";
+          });
+
           // Store the LOGICAL coordinates in data attributes
           square.dataset.row = row;
           square.dataset.col = col;
@@ -178,7 +194,6 @@ class ChessBoard {
     this.clearSelection();
     this.selectedSquare = position;
     this.possibleMoves = this.game.getLegalMoves(position);
-    this.renderSelection();
   }
 
   // Clear the current selection
@@ -192,52 +207,37 @@ class ChessBoard {
 
   // Render the current selection and possible moves
   renderSelection() {
-    // Do nothing - don't display any move indicators
+    // Completely empty - do not show any move indicators
     return;
   }
 
   // Make a move on the board
   makeMove(move) {
-    // Reset all state
-    this.selectedSquare = null;
-    this.possibleMoves = [];
-    this.clearAllHighlights(); // New method to clear everything
+    // Don't visualize any move animations or highlights
+    this.clearSelection(); // Clear any highlights first
 
-    try {
-      const moveResult = this.game.move({
-        from: move.from,
-        to: move.to,
-        promotion: move.promotion,
-      });
+    // Make the move in the game logic
+    const result = this.game.makeMove(move);
 
-      if (!moveResult) return false;
-
-      // Update board without ANY highlight effects
+    if (result) {
+      // Just update the board state - no animations or highlights
       this.render();
       this.updateCapturedPieces();
       this.updateMoveHistory();
 
-      // Remove any highlights that might have been added
-      this.clearAllHighlights();
-
-      // Game state checks
+      // Check for game over
       if (this.game.isGameOver()) {
         this.showGameOverMessage();
-      } else if (!this.game.isPlayerTurn()) {
-        // When AI is about to move, ensure board is clean
-        this.clearAllHighlights();
-        setTimeout(() => {
-          this.game.makeBotMove();
-          // Clean up again after AI moves
-          this.clearAllHighlights();
-        }, 500);
+        return;
       }
 
-      return true;
-    } catch (error) {
-      console.error("Move error:", error);
-      this.render();
-      return true;
+      // If playing against computer, make the bot move
+      if (
+        this.game.gameMode === "computer" &&
+        this.game.turn() !== this.game.playerColor
+      ) {
+        setTimeout(() => this.game.makeBotMove(), 300);
+      }
     }
   }
 
@@ -640,9 +640,9 @@ class ChessBoard {
     this.render();
   }
 
-  // Add this method to ChessBoard class
+  // Make sure this method does nothing
   highlightLastMove(from, to) {
-    // Do nothing - no move highlighting
+    // Completely empty - do not highlight last move
     return;
   }
 
