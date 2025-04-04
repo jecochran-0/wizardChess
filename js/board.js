@@ -422,12 +422,9 @@ class ChessBoard {
     movesContainer.scrollTop = movesContainer.scrollHeight;
   }
 
-  // Show game over message
+  // Updated showGameOverMessage to display in the side panel instead of a modal
   showGameOverMessage() {
     console.log("Showing game over message");
-    const gameOverModal = document.getElementById("game-over-modal");
-    const gameResult = document.getElementById("game-result");
-    const resultMessage = document.getElementById("result-message");
 
     // Only proceed if we can confirm there's actually a game over
     if (!this.game || !this.game.isGameOver()) {
@@ -435,27 +432,86 @@ class ChessBoard {
       return;
     }
 
+    // Get the game status element in the side panel
+    const statusElement = document.getElementById("game-status");
+    const capturedPiecesElement = document.getElementById("captured-pieces");
+
+    if (!statusElement || !capturedPiecesElement) {
+      console.error("Side panel elements not found");
+      return;
+    }
+
+    // Create a game over container for the side panel
+    const gameOverContainer = document.createElement("div");
+    gameOverContainer.id = "game-over-container";
+    gameOverContainer.className = "status-board game-over-container";
+
+    // Determine the appropriate message based on the game state
+    let title = "",
+      message = "";
+
     if (this.game.inCheckmate()) {
       const winner = this.game.turn() === "w" ? "Black" : "White";
-      gameResult.textContent = `${winner} Wins!`;
-      resultMessage.textContent = `Checkmate! The ${winner.toLowerCase()} wizard has prevailed.`;
+      title = `${winner} Wins by Checkmate!`;
+      message = `${winner} has checkmated the opponent.`;
     } else if (this.game.inDraw()) {
-      gameResult.textContent = "Draw!";
+      title = "Game Ended in Draw";
       if (this.game.insufficientMaterial()) {
-        resultMessage.textContent =
-          "Insufficient material to continue the spell duel.";
+        message = "Insufficient material to checkmate.";
       } else if (this.game.inStalemate()) {
-        resultMessage.textContent =
-          "Stalemate! The magic has reached an impasse.";
+        message = "Stalemate. No legal moves are available.";
       } else if (this.game.inThreefoldRepetition()) {
-        resultMessage.textContent =
-          "Threefold repetition! The magical patterns have repeated too many times.";
+        message = "Threefold repetition of position.";
       } else {
-        resultMessage.textContent = "The game is a draw.";
+        message = "The game ended in a draw.";
       }
     }
 
-    gameOverModal.classList.remove("hidden");
+    // Set the content of the game over container
+    gameOverContainer.innerHTML = `
+      <h2 class="game-over-title">${title}</h2>
+      <p class="game-over-message">${message}</p>
+      <div class="game-over-buttons">
+        <button id="side-play-again" class="wizard-button">
+          <i class="fas fa-redo-alt"></i> Play Again
+        </button>
+        <button id="side-menu" class="wizard-button">
+          <i class="fas fa-home"></i> Main Menu
+        </button>
+      </div>
+    `;
+
+    // Insert the game over container after the status element
+    statusElement.parentNode.insertBefore(
+      gameOverContainer,
+      capturedPiecesElement
+    );
+
+    // Update the game status to make it clear the game is over
+    statusElement.textContent = "Game Over";
+    statusElement.style.color = "#ff9800";
+
+    // Add event listeners to the buttons
+    document.getElementById("side-play-again").addEventListener("click", () => {
+      // Remove the game over container
+      gameOverContainer.remove();
+      // Reset the game status style
+      statusElement.style.color = "";
+      // Reset the game
+      this.game.resetGame();
+    });
+
+    document.getElementById("side-menu").addEventListener("click", () => {
+      // Remove the game over container
+      gameOverContainer.remove();
+      // Reset the game status style
+      statusElement.style.color = "";
+      // Return to main menu
+      document.getElementById("game-container").style.display = "none";
+      document.getElementById("main-menu").style.display = "flex";
+    });
+
+    console.log("Game over message displayed in side panel");
   }
 
   // Render the current board state

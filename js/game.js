@@ -282,59 +282,60 @@ class WizardChess {
     }
   }
 
-  // Check if the game is over
+  // Updated isGameOver method using proper Chess.js methods
   isGameOver() {
     try {
-      // Make sure we have a valid chess instance
-      if (!this.chess || typeof this.chess.game_over !== "function") {
-        console.error("Invalid chess instance when checking game over");
+      // Safety check for chess instance
+      if (!this.chess) {
+        console.error("Chess instance not available");
         return false;
       }
 
-      // Force return false for initial game state
-      const fen = this.chess.fen();
-      if (fen === "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") {
-        console.log("Initial game state detected, not game over");
-        return false;
+      // Use the proper Chess.js methods for game-over detection
+      const gameOver = this.chess.game_over();
+
+      if (gameOver) {
+        console.log(
+          "Game over condition detected:",
+          this.chess.in_checkmate()
+            ? "Checkmate"
+            : this.chess.in_draw()
+            ? "Draw"
+            : "Other"
+        );
       }
 
-      const result = this.chess.game_over();
-      console.log("Game over check result:", result);
-      return result;
+      return gameOver;
     } catch (error) {
       console.error("Error checking game over:", error);
       return false;
     }
   }
 
+  // Helper methods for specific game-over conditions
+  inCheckmate() {
+    return this.chess && this.chess.in_checkmate();
+  }
+
+  inDraw() {
+    return this.chess && this.chess.in_draw();
+  }
+
+  inStalemate() {
+    return this.chess && this.chess.in_stalemate();
+  }
+
+  inThreefoldRepetition() {
+    return this.chess && this.chess.in_threefold_repetition();
+  }
+
+  insufficientMaterial() {
+    return this.chess && this.chess.insufficient_material();
+  }
+
   // Check if the king is in check
   inCheck() {
     return this.chess.in_check();
-  }
-
-  // Check if the king is in checkmate
-  inCheckmate() {
-    return this.chess.in_checkmate();
-  }
-
-  // Check if the game is a draw
-  inDraw() {
-    return this.chess.in_draw();
-  }
-
-  // Check if the game is a stalemate
-  inStalemate() {
-    return this.chess.in_stalemate();
-  }
-
-  // Check if there's insufficient material
-  insufficientMaterial() {
-    return this.chess.insufficient_material();
-  }
-
-  // Check if position was repeated three times
-  inThreefoldRepetition() {
-    return this.chess.in_threefold_repetition();
   }
 
   // Get the current position
