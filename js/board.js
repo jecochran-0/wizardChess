@@ -194,21 +194,86 @@ class ChessBoard {
     this.clearSelection();
     this.selectedSquare = position;
     this.possibleMoves = this.game.getLegalMoves(position);
+
+    // Re-enable rendering selection with indicators
+    this.renderSelection();
   }
 
   // Clear the current selection
   clearSelection() {
     this.selectedSquare = null;
     this.possibleMoves = [];
-    document.querySelectorAll(".square").forEach((square) => {
-      square.classList.remove("selected", "possible-move", "possible-capture");
-    });
+
+    // Remove all indicators and highlights
+    document
+      .querySelectorAll(
+        ".square.selected, .square.possible-move, .square.possible-capture"
+      )
+      .forEach((square) => {
+        square.classList.remove(
+          "selected",
+          "possible-move",
+          "possible-capture"
+        );
+      });
   }
 
   // Render the current selection and possible moves
   renderSelection() {
-    // Completely empty - do not show any move indicators
-    return;
+    try {
+      // Check if a square is selected
+      if (!this.selectedSquare) {
+        return;
+      }
+
+      // Get the current turn and player color
+      const currentTurn = this.game.turn();
+      const playerColor = this.game.playerColor || "w"; // Default to white if not set
+
+      // Only show indicators if it's the player's turn
+      if (currentTurn !== playerColor) {
+        console.log("Not player's turn, hiding indicators");
+        return;
+      }
+
+      // Get the selected piece
+      const piece = this.game.getPiece(this.selectedSquare);
+      if (!piece || piece.color !== playerColor) {
+        console.log("Not player's piece, hiding indicators");
+        return;
+      }
+
+      // Get the selected square coordinates
+      const [row, col] = this.positionToRowCol(this.selectedSquare);
+      const square = this.getSquareElement(row, col);
+      if (square) {
+        square.classList.add("selected");
+      }
+
+      // Show possible moves with indicators
+      this.possibleMoves.forEach((move) => {
+        const [toRow, toCol] = this.positionToRowCol(move.to);
+        const targetSquare = this.getSquareElement(toRow, toCol);
+
+        if (targetSquare) {
+          // Check if it's a capture move
+          const isCapture =
+            this.game.getPiece(move.to) !== null || move.flags?.includes("c");
+
+          console.log(
+            `Adding indicator for move to ${move.to}, capture: ${isCapture}`
+          );
+
+          if (isCapture) {
+            targetSquare.classList.add("possible-capture");
+          } else {
+            targetSquare.classList.add("possible-move");
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error rendering selection:", error);
+    }
   }
 
   // Make a move on the board
@@ -544,6 +609,9 @@ class ChessBoard {
   // Render the current board state
   render() {
     try {
+      // Clear any indicators before rendering
+      this.clearAllIndicators();
+
       // Check if container element exists
       if (!this.containerElement) {
         console.error("Board container element is missing");
@@ -755,6 +823,15 @@ class ChessBoard {
         statusElement.textContent = `${currentTurn} to move`;
       }
     }
+  }
+
+  // Add a method to specifically clear just the move indicators
+  clearAllIndicators() {
+    document
+      .querySelectorAll(".square.possible-move, .square.possible-capture")
+      .forEach((square) => {
+        square.classList.remove("possible-move", "possible-capture");
+      });
   }
 }
 

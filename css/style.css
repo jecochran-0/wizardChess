@@ -497,27 +497,29 @@ h1 {
   }
 }
 
-/* Simplified possible move indicator */
-.square.possible-move::after {
-  content: "";
-  position: absolute;
-  width: 30%;
-  height: 30%;
-  border-radius: 50%;
-  background-color: rgba(255, 167, 38, 0.85);
-  box-shadow: 0 0 10px rgba(255, 167, 38, 0.7);
-  z-index: 1;
+/* Movement indicators for player pieces */
+.square.possible-move::after,
+.square.possible-capture::after {
+  content: "" !important;
+  display: block !important;
+  width: 24px !important;
+  height: 24px !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 50% !important;
+  z-index: 10 !important; /* Higher z-index to ensure visibility */
+  pointer-events: none !important;
 }
 
-/* Simplified possible capture indicator */
+.square.possible-move::after {
+  background-color: rgba(255, 215, 0, 0.7) !important; /* Brighter yellow */
+}
+
 .square.possible-capture::after {
-  content: "";
-  position: absolute;
-  width: 90%;
-  height: 90%;
-  border-radius: 50%;
-  border: 3px solid rgba(240, 180, 41, 0.85);
-  z-index: 2;
+  background-color: rgba(255, 165, 0, 0.8) !important; /* Brighter orange */
+  border: 2px solid rgba(255, 140, 0, 0.9) !important; /* Darker orange border */
 }
 
 /* Clean animation for moving pieces */

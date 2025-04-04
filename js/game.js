@@ -181,7 +181,7 @@ class WizardChess {
 
   // Check if it's the player's turn
   isPlayerTurn() {
-    return this.chess.turn() === this.playerColor;
+    return this.turn() === this.playerColor;
   }
 
   // Get legal moves for a piece
@@ -229,28 +229,10 @@ class WizardChess {
 
   // Highlight the bot's move
   highlightBotMove(move) {
-    // First, select the source square
-    const [fromRow, fromCol] = this.board.positionToRowCol(move.from);
-    const fromSquare = this.board.getSquareElement(fromRow, fromCol);
-    fromSquare.classList.add("selected");
+    // Don't highlight bot moves at all - remove all highlighting code
+    console.log("Bot move:", move.from, "to", move.to);
 
-    // Then, highlight the destination square
-    const [toRow, toCol] = this.board.positionToRowCol(move.to);
-    const toSquare = this.board.getSquareElement(toRow, toCol);
-    toSquare.classList.add("possible-move");
-
-    // If it's a capture, use the capture highlight
-    if (this.getPiece(move.to)) {
-      toSquare.classList.remove("possible-move");
-      toSquare.classList.add("possible-capture");
-    }
-
-    // Also mark it as the last move for consistent highlighting
-    if (typeof this.board.highlightLastMove === "function") {
-      setTimeout(() => {
-        this.board.highlightLastMove(move.from, move.to);
-      }, 600); // Apply after the animation
-    }
+    // No visual indicators for bot moves
   }
 
   // Undo the player's last move
