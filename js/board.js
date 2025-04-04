@@ -119,8 +119,13 @@ class ChessBoard {
       );
 
       if (move) {
+        console.log("Move found:", move);
+        // Log move flags to debug promotion detection
+        console.log("Move flags:", move.flags);
+
         // Check if it's a pawn promotion
-        if (move.flags.includes("p")) {
+        if (move.flags && move.flags.includes("p")) {
+          console.log("Promotion move detected!");
           this.showPromotionDialog(move);
         } else {
           this.makeMove(move);
@@ -209,35 +214,127 @@ class ChessBoard {
     }
   }
 
-  // Show promotion dialog
+  // Updated showPromotionDialog to use correct image paths
   showPromotionDialog(move) {
-    this.pendingPromotion = move;
-    const promotionDialog = document.getElementById("promotion-selection");
+    console.log("Showing promotion dialog for move:", move);
 
-    // Set the images for the promotion pieces
+    this.pendingPromotion = move;
+
+    // Force remove any existing promotion dialog to start fresh
+    const existingDialog = document.getElementById("promotion-selection");
+    if (existingDialog) {
+      existingDialog.remove();
+    }
+
+    // Create a completely new dialog element
+    const dialogElement = document.createElement("div");
+    dialogElement.id = "promotion-selection";
+    dialogElement.innerHTML = `
+      <h3>Choose a piece:</h3>
+      <div class="promotion-options">
+        <div class="promotion-piece" data-piece="q"></div>
+        <div class="promotion-piece" data-piece="r"></div>
+        <div class="promotion-piece" data-piece="b"></div>
+        <div class="promotion-piece" data-piece="n"></div>
+      </div>
+    `;
+
+    // Force additional styles to guarantee visibility
+    dialogElement.style.position = "fixed";
+    dialogElement.style.top = "50%";
+    dialogElement.style.left = "50%";
+    dialogElement.style.transform = "translate(-50%, -50%)";
+    dialogElement.style.zIndex = "9999";
+    dialogElement.style.display = "flex";
+    dialogElement.style.flexDirection = "column";
+    dialogElement.style.backgroundColor = "rgba(40, 22, 55, 0.95)";
+    dialogElement.style.border = "3px solid #ff9800";
+    dialogElement.style.boxShadow = "0 0 40px rgba(142, 68, 173, 0.8)";
+
+    // Add the dialog to the body (not the board) for maximum visibility
+    document.body.appendChild(dialogElement);
+
+    // Set the images for the promotion pieces - USE CORRECT PATHS
     const color = this.game.turn();
+    const pieceTypeMap = {
+      q: "queen",
+      r: "rook",
+      b: "bishop",
+      n: "knight",
+    };
+
     const pieces = ["q", "r", "b", "n"]; // queen, rook, bishop, knight
 
-    document.querySelectorAll(".promotion-piece").forEach((element, index) => {
-      const pieceType = pieces[index];
-      element.style.backgroundImage = `url('./Chess_Sprites/${color}_${pieceType}.png')`;
-      element.dataset.piece = pieceType;
-    });
+    dialogElement
+      .querySelectorAll(".promotion-piece")
+      .forEach((element, index) => {
+        const pieceType = pieces[index];
+        const fullPieceName = pieceTypeMap[pieceType];
 
-    promotionDialog.classList.remove("hidden");
+        // Use the correct image paths based on the pieceImages mapping
+        const imagePath = `./Chess_Sprites/${color}_${fullPieceName}.png`;
+        console.log(`Setting promotion image: ${imagePath}`);
+
+        element.style.backgroundImage = `url('${imagePath}')`;
+        element.dataset.piece = pieceType;
+        element.style.width = "70px";
+        element.style.height = "70px";
+        element.style.cursor = "pointer";
+        element.style.backgroundSize = "contain";
+        element.style.backgroundRepeat = "no-repeat";
+        element.style.backgroundPosition = "center";
+
+        // Add click listener with extra logging
+        element.addEventListener("click", (e) => {
+          const selectedPiece = e.currentTarget.dataset.piece;
+          console.log(`Promotion piece clicked: ${selectedPiece}`);
+          this.completePromotion(selectedPiece);
+        });
+      });
+
+    console.log("NEW Promotion dialog created and should be visible now");
   }
 
-  // Complete the promotion move
+  // Improved completePromotion method
   completePromotion(promotionPiece) {
-    if (!this.pendingPromotion) return;
+    console.log("Completing promotion with piece:", promotionPiece);
 
-    const move = this.pendingPromotion;
+    if (!this.pendingPromotion) {
+      console.error("No pending promotion!");
+      return;
+    }
+
+    const move = { ...this.pendingPromotion }; // Create a copy to avoid reference issues
     move.promotion = promotionPiece;
 
-    document.getElementById("promotion-selection").classList.add("hidden");
+    // Remove the dialog first
+    const promotionDialog = document.getElementById("promotion-selection");
+    if (promotionDialog) {
+      promotionDialog.remove();
+    }
+
+    // Clear pending state
     this.pendingPromotion = null;
 
-    this.makeMove(move);
+    // Make the move immediately (no timeout)
+    console.log("Executing promotion move:", move);
+    this.game.chess.move({
+      from: move.from,
+      to: move.to,
+      promotion: move.promotion,
+    });
+
+    // Update the board after the move
+    this.render();
+    this.updateCapturedPieces();
+    this.updateMoveHistory();
+
+    // If it's the computer's turn, let them move
+    if (!this.game.isPlayerTurn()) {
+      setTimeout(() => {
+        this.game.makeBotMove();
+      }, 500);
+    }
   }
 
   // Simplified animateMove method that doesn't rely on promises

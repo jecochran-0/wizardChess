@@ -65,6 +65,16 @@ class WizardChess {
     this.board.init();
     this.setupEventListeners();
 
+    // Set up promotion selection event listeners
+    document.querySelectorAll(".promotion-piece").forEach((element) => {
+      element.addEventListener("click", (e) => {
+        const piece = e.currentTarget.dataset.piece;
+        if (this.board.pendingPromotion && piece) {
+          this.board.completePromotion(piece);
+        }
+      });
+    });
+
     // If player is black, make the first move for the bot
     if (this.playerColor === "b") {
       setTimeout(() => this.makeBotMove(), 500);

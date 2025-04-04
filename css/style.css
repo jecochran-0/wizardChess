@@ -267,31 +267,61 @@ h1 {
   display: none !important;
 }
 
+/* Completely revised promotion dialog styling for maximum visibility */
 #promotion-selection {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(44, 62, 80, 0.95);
-  border: 2px solid var(--accent-gold);
-  border-radius: 10px;
-  padding: 10px;
-  display: flex;
-  gap: 10px;
+  position: fixed !important; /* Use fixed to ensure it's visible */
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  background-color: rgba(40, 22, 55, 0.95) !important;
+  border: 3px solid #ff9800 !important;
+  border-radius: 10px !important;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 15px !important;
+  z-index: 9999 !important; /* Extremely high z-index */
+  box-shadow: 0 0 40px rgba(142, 68, 173, 0.8) !important;
+  min-width: 350px !important;
+  text-align: center !important;
+}
+
+#promotion-selection h3 {
+  color: #ffd54f !important;
+  font-size: 1.5rem !important;
+  margin: 0 0 15px 0 !important;
+  text-shadow: 0 0 8px rgba(255, 152, 0, 0.4) !important;
+}
+
+.promotion-options {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 20px !important;
 }
 
 .promotion-piece {
-  width: 60px;
-  height: 60px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  width: 70px !important;
+  height: 70px !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  cursor: pointer !important;
+  border-radius: 8px !important;
+  background-color: rgba(255, 167, 38, 0.2) !important;
+  border: 2px solid #ff9800 !important;
+  transition: transform 0.2s ease !important;
 }
 
 .promotion-piece:hover {
-  transform: scale(1.1);
+  transform: scale(1.15) !important;
+  background-color: rgba(255, 167, 38, 0.4) !important;
+  border: 3px solid #ffb74d !important;
+  box-shadow: 0 0 20px rgba(255, 167, 38, 0.6) !important;
+}
+
+/* Override the hidden class specifically for promotion dialog */
+#promotion-selection.hidden {
+  display: none !important;
 }
 
 .modal {

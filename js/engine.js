@@ -33,6 +33,12 @@ class ChessEngine {
     const bestMove = this.minimaxRoot(this.depth, true);
     const endTime = Date.now();
     console.log(`Engine calculated move in ${endTime - startTime}ms`);
+
+    // If it's a promotion, always choose queen (strongest piece)
+    if (bestMove && bestMove.flags && bestMove.flags.includes("p")) {
+      bestMove.promotion = "q";
+    }
+
     return bestMove;
   }
 
