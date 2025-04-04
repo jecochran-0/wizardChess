@@ -1026,3 +1026,100 @@ h1 {
   /* Apply a slight darkening filter to help black pieces blend better */
   filter: brightness(0.95) drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.5));
 }
+
+/* Styles for color selector and difficulty in main menu */
+.menu-option-group {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.menu-option-group h3 {
+  color: #ffd54f;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px rgba(255, 152, 0, 0.5);
+}
+
+.color-selector {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.color-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: rgba(40, 22, 55, 0.8);
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 2px solid #7b5eb9;
+  transition: all 0.25s ease;
+}
+
+.color-option input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.color-option input:checked + .color-label {
+  color: #ffd54f;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(255, 152, 0, 0.7);
+}
+
+.color-option:has(input:checked) {
+  border-color: #ff9800;
+  background: rgba(80, 45, 110, 0.9);
+  box-shadow: 0 0 15px rgba(255, 152, 0, 0.4);
+}
+
+.color-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-family: "Luminari", fantasy;
+}
+
+.color-label img {
+  width: 25px;
+  height: 25px;
+}
+
+#menu-difficulty {
+  background: rgba(40, 22, 55, 0.9);
+  color: #fff;
+  border: 2px solid #7b5eb9;
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-family: "Luminari", fantasy;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 200px;
+  text-align: center;
+}
+
+#menu-difficulty:focus {
+  outline: none;
+  border-color: #ff9800;
+  box-shadow: 0 0 10px rgba(255, 152, 0, 0.4);
+}
+
+/* Remove the previous flipping styles */
+.chess-board.flipped,
+#board.flipped {
+  /* Remove transform: rotate(180deg); */
+}
+
+.chess-board.flipped .piece,
+#board.flipped .piece {
+  /* Remove transform: rotate(180deg); */
+}
+
+.chess-board.flipped .square-label,
+#board.flipped .square-label {
+  /* Remove transform: rotate(180deg); */
+}

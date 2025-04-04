@@ -62,8 +62,12 @@ class WizardChess {
 
   // Initialize the game
   init() {
-    this.board.init();
+    console.log("Initializing board");
+    this.createBoard();
     this.setupEventListeners();
+
+    // Set the board orientation based on player color
+    this.setOrientation(this.playerColor);
 
     // Set up promotion selection event listeners
     document.querySelectorAll(".promotion-piece").forEach((element) => {
@@ -379,25 +383,31 @@ class WizardChess {
       // Create new chess instance
       this.chess = new Chess();
 
-      // Force hide game over modal with multiple approaches
+      // Force hide game over modal
       const gameOverModal = document.getElementById("game-over-modal");
       if (gameOverModal) {
         gameOverModal.classList.add("hidden");
-        gameOverModal.style.display = "none"; // Force hide with inline style
       }
 
-      // Reset board
+      // Set board orientation based on player color
+      this.board.setOrientation(this.playerColor);
+
+      // Reset board state
       this.board.clearSelection();
-      this.board.createBoard(); // Recreate the board elements
-      this.board.setupEventListeners(); // Reinitialize event listeners
       this.board.render();
       this.board.updateCapturedPieces();
       this.board.updateMoveHistory();
 
-      // Run the conflict check to make sure we're in a clean state
-      this.checkForGameStateConflicts();
+      // If player is black, make the computer's first move
+      if (this.playerColor === "b" && this.gameMode === "computer") {
+        setTimeout(() => this.makeBotMove(), 800);
+      }
 
-      console.log("Game fully reset, current FEN:", this.chess.fen());
+      console.log(
+        `Game reset with player as ${
+          this.playerColor === "w" ? "White" : "Black"
+        }`
+      );
     } catch (error) {
       console.error("Reset game error:", error);
     }
@@ -432,6 +442,47 @@ class WizardChess {
         this.chess = new Chess();
       }
     }
+  }
+
+  // Add a simple setGameMode method to the WizardChess class
+  setGameMode(mode) {
+    this.gameMode = mode;
+    console.log(`Game mode set to: ${mode}`);
+  }
+
+  // Add a method to set board orientation based on player color
+  setOrientation(playerColor) {
+    // Update the player color
+    this.playerColor = playerColor;
+
+    // Use the board's method to handle the visual orientation
+    this.board.setOrientation(playerColor);
+  }
+
+  // Fix the rowColToPosition method to handle board orientation
+  rowColToPosition(row, col) {
+    // When flipped, we need to invert the row and column
+    if (this.flipped) {
+      row = 7 - row;
+      col = 7 - col;
+    }
+
+    const file = String.fromCharCode("a".charCodeAt(0) + col);
+    const rank = 8 - row;
+    return `${file}${rank}`;
+  }
+
+  // Fix positionToRowCol to handle board orientation
+  positionToRowCol(position) {
+    const col = position.charCodeAt(0) - "a".charCodeAt(0);
+    const row = 8 - parseInt(position.charAt(1));
+
+    // When flipped, invert the coordinates
+    if (this.flipped) {
+      return [7 - row, 7 - col];
+    }
+
+    return [row, col];
   }
 }
 

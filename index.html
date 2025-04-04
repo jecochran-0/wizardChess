@@ -30,6 +30,36 @@
       <div class="menu-content">
         <h1 class="game-title" data-text="Wizard Chess">Wizard Chess</h1>
         <div class="menu-options">
+          <div class="menu-option-group">
+            <h3>Play as</h3>
+            <div class="color-selector">
+              <label class="color-option">
+                <input type="radio" name="player-color" value="w" checked />
+                <span class="color-label"
+                  ><img src="./Chess_Sprites/w_king.png" alt="White" />
+                  White</span
+                >
+              </label>
+              <label class="color-option">
+                <input type="radio" name="player-color" value="b" />
+                <span class="color-label"
+                  ><img src="./Chess_Sprites/b_king.png" alt="Black" />
+                  Black</span
+                >
+              </label>
+            </div>
+          </div>
+
+          <div class="menu-option-group">
+            <h3>Difficulty</h3>
+            <select id="menu-difficulty">
+              <option value="1">Apprentice</option>
+              <option value="2" selected>Adept</option>
+              <option value="3">Master</option>
+              <option value="4">Archmage</option>
+            </select>
+          </div>
+
           <button id="play-computer" class="menu-button">
             <i class="fas fa-chess-knight"></i> Play Against Computer
           </button>

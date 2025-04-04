@@ -56,18 +56,45 @@ class ChessBoard {
 
   // Create the chessboard squares
   createBoard() {
-    this.containerElement.innerHTML = "";
+    try {
+      // Clear the container
+      this.containerElement.innerHTML = "";
 
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        const square = document.createElement("div");
-        square.className = `square ${
-          (row + col) % 2 === 0 ? "square-light" : "square-dark"
-        }`;
-        square.dataset.row = this.flipped ? 7 - row : row;
-        square.dataset.col = this.flipped ? 7 - col : col;
-        this.containerElement.appendChild(square);
+      console.log(
+        `Creating chess board with orientation: ${
+          this.flipped ? "Black" : "White"
+        }`
+      );
+
+      // Create the board with squares in the proper visual order
+      for (let visualRow = 0; visualRow < 8; visualRow++) {
+        for (let visualCol = 0; visualCol < 8; visualCol++) {
+          // Convert visual coordinates to logical coordinates based on orientation
+          const row = this.flipped ? 7 - visualRow : visualRow;
+          const col = this.flipped ? 7 - visualCol : visualCol;
+
+          const square = document.createElement("div");
+          square.className = `square ${
+            (visualRow + visualCol) % 2 === 0 ? "square-light" : "square-dark"
+          }`;
+
+          // Store the LOGICAL coordinates in data attributes
+          square.dataset.row = row;
+          square.dataset.col = col;
+
+          // Click handler uses logical coordinates
+          square.addEventListener("click", () =>
+            this.handleSquareClick(row, col)
+          );
+
+          // Append to container
+          this.containerElement.appendChild(square);
+        }
       }
+
+      console.log("Board created successfully");
+    } catch (error) {
+      console.error("Error creating board:", error);
     }
   }
 
@@ -516,72 +543,93 @@ class ChessBoard {
 
   // Render the current board state
   render() {
-    const position = this.game.getPosition();
+    try {
+      // Check if container element exists
+      if (!this.containerElement) {
+        console.error("Board container element is missing");
+        return;
+      }
 
-    // Before updating the board, record the container's dimensions
-    const containerHeight = this.containerElement.offsetHeight;
-    const containerWidth = this.containerElement.offsetWidth;
+      // Get position from chess instance
+      const position = this.game.getPosition();
 
-    // Update pieces
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        const square = this.getSquareElement(row, col);
-        square.innerHTML = "";
+      // Update pieces
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          // Calculate the visual coordinates based on orientation
+          const visualRow = this.flipped ? 7 - row : row;
+          const visualCol = this.flipped ? 7 - col : col;
 
-        const pos = this.rowColToPosition(row, col);
-        const piece = position[pos];
+          // Get the square element using visual coordinates
+          const square = this.getSquareElement(row, col);
+          if (!square) {
+            console.warn(`Square element at row=${row}, col=${col} not found`);
+            continue;
+          }
 
-        if (piece) {
-          const pieceElement = document.createElement("div");
-          pieceElement.className = "piece";
-          const pieceCode =
-            (piece.color === "w" ? "w" : "b") + piece.type.toUpperCase();
-          pieceElement.style.backgroundImage = `url('./Chess_Sprites/${this.pieceImages[pieceCode]}')`;
-          square.appendChild(pieceElement);
+          // Clear the square
+          square.innerHTML = "";
+
+          // Get position in chess notation
+          const pos = this.rowColToPosition(row, col);
+          const piece = position[pos];
+
+          // Add piece if there is one
+          if (piece) {
+            const pieceElement = document.createElement("div");
+            pieceElement.className = "piece";
+            const pieceCode =
+              (piece.color === "w" ? "w" : "b") + piece.type.toUpperCase();
+            pieceElement.style.backgroundImage = `url('./Chess_Sprites/${this.pieceImages[pieceCode]}')`;
+            square.appendChild(pieceElement);
+          }
         }
       }
-    }
-
-    // After updating, verify dimensions haven't changed
-    if (
-      this.containerElement.offsetHeight !== containerHeight ||
-      this.containerElement.offsetWidth !== containerWidth
-    ) {
-      console.log("Container dimensions changed, restoring...");
-      this.containerElement.style.height = `${containerHeight}px`;
-      this.containerElement.style.width = `${containerWidth}px`;
-    }
-
-    // Update game status
-    const statusElement = document.getElementById("game-status");
-    const turn = this.game.turn() === "w" ? "White" : "Black";
-
-    if (this.game.inCheck()) {
-      statusElement.textContent = `${turn} is in check!`;
-    } else {
-      statusElement.textContent = `${turn} to move`;
+    } catch (error) {
+      console.error("Error rendering board:", error);
     }
   }
 
   // Utility: Get square element from row and column
   getSquareElement(row, col) {
-    const index = row * 8 + col;
-    return this.containerElement.children[index];
+    try {
+      // Sanity check
+      if (row < 0 || row > 7 || col < 0 || col > 7) {
+        console.warn(`Invalid square coordinates: row=${row}, col=${col}`);
+        return null;
+      }
+
+      // Find by data attributes first (most reliable)
+      const square = this.containerElement.querySelector(
+        `[data-row="${row}"][data-col="${col}"]`
+      );
+      if (square) return square;
+
+      // Fallback to index-based lookup if needed
+      const index = row * 8 + col;
+      return this.containerElement.children[index] || null;
+    } catch (error) {
+      console.error(
+        `Error getting square element at row=${row}, col=${col}:`,
+        error
+      );
+      return null;
+    }
   }
 
   // Utility: Convert position (e.g., 'e4') to row and column
   positionToRowCol(position) {
+    // Standard algebraic notation to row/col (a8 is 0,0 in the array)
     const col = position.charCodeAt(0) - "a".charCodeAt(0);
     const row = 8 - parseInt(position.charAt(1));
-    return this.flipped ? [7 - row, 7 - col] : [row, col];
+    return [row, col];
   }
 
   // Utility: Convert row and column to position
   rowColToPosition(row, col) {
-    const actualRow = this.flipped ? 7 - row : row;
-    const actualCol = this.flipped ? 7 - col : col;
-    const file = String.fromCharCode("a".charCodeAt(0) + actualCol);
-    const rank = 8 - actualRow;
+    // Standard conversion from row/col to algebraic notation
+    const file = String.fromCharCode("a".charCodeAt(0) + col);
+    const rank = 8 - row;
     return `${file}${rank}`;
   }
 
@@ -667,6 +715,23 @@ class ChessBoard {
       childList: true,
       subtree: true,
     });
+  }
+
+  // Add a method to set board orientation based on player color
+  setOrientation(playerColor) {
+    // Set orientation state
+    this.flipped = playerColor === "b";
+
+    // No CSS transform rotation - we'll handle this with logical board rendering
+    this.containerElement.classList.remove("flipped");
+
+    // Re-create the board with the new orientation
+    this.createBoard();
+    this.render();
+
+    console.log(
+      `Board orientation set to ${this.flipped ? "Black" : "White"} perspective`
+    );
   }
 }
 

@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const playLocalBtn = document.getElementById("play-local");
   const returnToMenuBtn = document.getElementById("return-to-menu");
   const modalMenuBtn = document.getElementById("modal-menu");
+  const menuDifficultySelect = document.getElementById("menu-difficulty");
 
   // Game mode tracking
   let isComputerOpponent = true;
@@ -30,13 +31,44 @@ document.addEventListener("DOMContentLoaded", function () {
   // Start game against computer
   playComputerBtn.addEventListener("click", function () {
     isComputerOpponent = true;
+
+    // Get selected color
+    const playerColor = document.querySelector(
+      'input[name="player-color"]:checked'
+    ).value;
+
+    // Get selected difficulty
+    const difficulty = menuDifficultySelect.value;
+
+    // Show game screen
     showGame();
 
-    // Reset the game with computer opponent
-    if (window.game && typeof window.game.resetGame === "function") {
-      window.game.setGameMode("computer");
-      window.game.resetGame();
+    // Create a new game instance if needed
+    if (!window.game) {
+      window.game = new WizardChess();
     }
+
+    // Set game to computer mode
+    window.game.setGameMode("computer");
+
+    // Set player color (this will also set board orientation)
+    window.game.setOrientation(playerColor);
+
+    // Set difficulty
+    window.game.engine.setDifficulty(difficulty);
+
+    // Hide difficulty selector in game UI
+    const difficultySelector = document.querySelector(".difficulty-selector");
+    if (difficultySelector) {
+      difficultySelector.style.display = "none";
+    }
+
+    // Reset game to apply all settings
+    window.game.resetGame();
+
+    console.log(
+      `Game started with player as ${playerColor === "w" ? "White" : "Black"}`
+    );
   });
 
   // Start local game (human vs human)
