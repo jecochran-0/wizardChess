@@ -470,3 +470,46 @@ function createAssetsStructure() {
     /assets/images/pieces/b_king.png - Black king
   `);
 }
+
+// Game initialization and control
+if (!window.game) window.game = {};
+
+// Set up the game object
+(function (game) {
+  let gameMode = "computer"; // default mode
+
+  // Set game mode (computer or local)
+  game.setGameMode = function (mode) {
+    gameMode = mode;
+    console.log(`Game mode set to: ${mode}`);
+
+    // Update UI elements based on game mode
+    const difficultySelector = document.querySelector(".difficulty-selector");
+    if (difficultySelector) {
+      difficultySelector.style.display = mode === "computer" ? "block" : "none";
+    }
+  };
+
+  // Reset the game
+  game.resetGame = function () {
+    // Your existing reset logic
+    console.log("Game reset");
+
+    // Initialize board
+    if (window.board && typeof window.board.init === "function") {
+      window.board.init();
+    }
+
+    // Set up computer opponent if needed
+    if (gameMode === "computer" && window.engine) {
+      console.log("Setting up computer opponent");
+      // Configure engine based on difficulty selector
+      const difficulty = document.getElementById("difficulty").value;
+      if (window.engine.setDifficulty) {
+        window.engine.setDifficulty(difficulty);
+      }
+    }
+  };
+
+  // You may need to adapt other existing functions to respect the game mode
+})(window.game);

@@ -7,13 +7,44 @@
     <link rel="stylesheet" href="css/style.css" />
     <!-- Chess.js library for game logic -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <!-- Add this line to include Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
   </head>
   <body>
-    <div class="game-container">
-      <header>
-        <h1>Wizard Chess</h1>
-      </header>
+    <!-- Main Menu -->
+    <div class="main-menu" id="main-menu">
+      <!-- Background image with @ symbol removed -->
+      <img
+        src="mainMenuBackground.png"
+        alt="Background"
+        class="menu-background"
+      />
 
+      <!-- Wizard image with @ symbol removed -->
+      <img src="mainMenuWizard.png" alt="Wizard" class="menu-wizard" />
+
+      <!-- Menu content - centered -->
+      <div class="menu-content">
+        <h1 class="game-title" data-text="Wizard Chess">Wizard Chess</h1>
+        <div class="menu-options">
+          <button id="play-computer" class="menu-button">
+            <i class="fas fa-chess-knight"></i> Play Against Computer
+          </button>
+          <button id="play-local" class="menu-button">
+            <i class="fas fa-chess-board"></i> Local Play
+          </button>
+        </div>
+      </div>
+
+      <!-- Version tag -->
+      <div class="version-tag">Wizard Chess v1.0</div>
+    </div>
+
+    <!-- Game Container (hidden initially) -->
+    <div class="game-container" id="game-container" style="display: none">
       <div class="game-area">
         <div class="board-container">
           <div id="board" class="chess-board"></div>
@@ -52,21 +83,24 @@
             <button id="new-game">New Game</button>
             <button id="undo-move">Undo Move</button>
             <button id="hint">Hint</button>
+            <button id="return-to-menu">Main Menu</button>
           </div>
-        </div>
-      </div>
-
-      <div id="game-over-modal" class="modal hidden">
-        <div class="modal-content">
-          <h2 id="game-result">Game Over</h2>
-          <p id="result-message"></p>
-          <button id="new-game-modal">New Game</button>
         </div>
       </div>
     </div>
 
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="game-result">Game Over</h2>
+        <p id="result-message"></p>
+        <button id="play-again">Play Again</button>
+        <button id="modal-menu">Return to Menu</button>
+      </div>
+    </div>
+
+    <!-- Scripts -->
     <script>
-      // Check if Chess.js loaded properly
       window.addEventListener("load", function () {
         if (typeof Chess === "undefined") {
           console.error("Chess.js failed to load");
@@ -81,38 +115,6 @@
     <script src="js/board.js"></script>
     <script src="js/engine.js"></script>
     <script src="js/game.js"></script>
-
-    <script>
-      // Immediate fix to hide the game over modal on page load
-      document.addEventListener("DOMContentLoaded", function () {
-        console.log("Hiding game over modal on page load");
-        const gameOverModal = document.getElementById("game-over-modal");
-        if (gameOverModal) {
-          gameOverModal.classList.add("hidden");
-        }
-      });
-    </script>
-
-    <script>
-      // Force fix for any UI or game state issues
-      window.addEventListener("load", function () {
-        console.log("Window loaded - applying direct fixes");
-
-        // Hide the game over modal with direct DOM manipulation
-        const gameOverModal = document.getElementById("game-over-modal");
-        if (gameOverModal) {
-          gameOverModal.classList.add("hidden");
-          gameOverModal.style.display = "none";
-        }
-
-        // Force a new game start after a short delay
-        setTimeout(function () {
-          if (window.game && typeof window.game.resetGame === "function") {
-            window.game.resetGame();
-            console.log("Forced game reset after page load");
-          }
-        }, 300);
-      });
-    </script>
+    <script src="js/menu.js"></script>
   </body>
 </html>

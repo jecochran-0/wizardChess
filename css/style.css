@@ -513,3 +513,198 @@ button:active {
 .piece.moving {
   z-index: 10;
 }
+
+/* Main Menu Enhanced Styling */
+.main-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: none;
+}
+
+/* Background image */
+.menu-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Wizard image - flipped and larger */
+.menu-wizard {
+  display: none; /* Hide the wizard */
+}
+
+/* Updated menu content to match the background */
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  background-color: rgba(36, 20, 50, 0.85); /* Darker purple background */
+  border-radius: 15px;
+  border: 3px solid #ff9800; /* Brighter orange border */
+  box-shadow: 0 0 30px rgba(255, 105, 180, 0.5),
+    /* Pink glow like in image */ inset 0 0 30px rgba(142, 68, 173, 0.5);
+  z-index: 3;
+  margin: 0 auto; /* Center horizontally */
+  max-width: 500px;
+  backdrop-filter: blur(6px);
+  position: relative; /* Ensure proper stacking */
+  transform: translateY(-20px); /* Move slightly up for better positioning */
+}
+
+/* Add chess-themed decorative corners */
+.menu-content::before,
+.menu-content::after {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.8;
+}
+
+.menu-content::before {
+  top: -15px;
+  left: -15px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffa726"><path d="M20 6h-3V4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v3h2V4h11v2H6c-1.1 0-2 .9-2 2v11H2v3h3v-2h11v2h2v-3h-2V8h4v10h2V8c0-1.1-.9-2-2-2z"/></svg>');
+}
+
+.menu-content::after {
+  bottom: -15px;
+  right: -15px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffa726"><path d="M20 6h-3V4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v3h2V4h11v2H6c-1.1 0-2 .9-2 2v11H2v3h3v-2h11v2h2v-3h-2V8h4v10h2V8c0-1.1-.9-2-2-2z"/></svg>');
+  transform: rotate(180deg);
+}
+
+/* Enhanced title with more professional glow */
+.game-title {
+  font-size: 5.5rem;
+  font-family: "Luminari", "Papyrus", fantasy;
+  color: #ffb74d;
+  /* Simplified shadow for less blur */
+  text-shadow: 0 0 8px rgba(255, 152, 0, 0.7), 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin-bottom: 50px;
+  letter-spacing: 4px;
+  text-align: center;
+  position: relative;
+  z-index: 5;
+  /* Add this to improve text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Improved gold outline effect for title */
+.game-title::before {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  -webkit-text-stroke: 3px #ff9800;
+  text-stroke: 3px #ff9800;
+  color: transparent;
+}
+
+/* Enhanced button styling with themed icons */
+.menu-button {
+  padding: 20px 30px;
+  font-family: "Luminari", fantasy;
+  font-size: 1.4rem;
+  background: linear-gradient(to bottom, #7b5eb9, #433080);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  letter-spacing: 1px;
+  width: 100%;
+  box-shadow: 0 4px 0 #372869, 0 5px 15px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Custom icon styles for buttons */
+.menu-button i {
+  font-size: 1.8rem;
+  color: #ffd54f;
+  filter: drop-shadow(0 0 5px rgba(255, 213, 79, 0.7));
+}
+
+/* Enhanced sparkle effect */
+.sparkle {
+  position: absolute;
+  width: 6px; /* Larger size */
+  height: 6px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.9); /* Brighter glow */
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  animation: enhanced-twinkle ease-in-out infinite;
+}
+
+/* Larger sparkles for variety */
+.sparkle.large {
+  width: 10px;
+  height: 10px;
+  box-shadow: 0 0 20px 8px rgba(255, 213, 79, 0.9); /* Gold glow */
+}
+
+/* Enhanced twinkle animation */
+@keyframes enhanced-twinkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2); /* More dramatic scale */
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+/* Updated menu options container */
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* More space between buttons */
+  width: 100%;
+  max-width: 350px;
+}
+
+/* Update version tag to match theme */
+.version-tag {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: rgba(255, 167, 38, 0.7); /* Orange to match theme */
+  font-size: 0.8rem;
+  font-family: monospace;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Remove sparkle effects */
+.magical-stars {
+  display: none; /* Hide the stars container */
+}
