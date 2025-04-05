@@ -235,3 +235,347 @@
 .selected-spell-card:hover {
   transform: scale(1.05);
 }
+
+/* Redesigned Vertical Spell Dashboard */
+.spell-dashboard {
+  position: absolute;
+  left: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(44, 22, 84, 0.9);
+  border-radius: 12px;
+  padding: 15px 15px 15px 15px;
+  color: white;
+  z-index: 100;
+  width: 165px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 2px solid #ffa726;
+  backdrop-filter: blur(3px);
+  display: flex;
+}
+
+/* Container for spell cards */
+.spell-cards-container {
+  flex: 1;
+}
+
+/* Vertical mana bar container */
+.mana-bar-vertical {
+  width: 20px;
+  height: 100%;
+  margin-left: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Title */
+.spell-dashboard-title {
+  font-size: 18px;
+  color: #ffd54f;
+  margin: 0 0 15px 0;
+  text-align: center;
+  font-family: "MedievalSharp", cursive, serif;
+}
+
+/* Vertical mana bar styling */
+.mana-bar-container {
+  width: 15px;
+  height: 200px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #7b5eb9;
+}
+
+.mana-bar-fill {
+  width: 100%;
+  background: linear-gradient(to top, #3f51b5, #7c4dff, #b388ff);
+  border-radius: 8px;
+  position: absolute;
+  bottom: 0;
+  transition: height 0.5s ease;
+}
+
+.mana-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffd54f;
+  margin-top: 10px;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+}
+
+.mana-icon {
+  font-size: 22px;
+  margin-bottom: 5px;
+  color: #9c4dff;
+  text-shadow: 0 0 8px #6200ea;
+}
+
+/* Vertical spell cards */
+.spell-hand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.spell-card-mini {
+  width: 100px;
+  height: 140px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid #ffa726;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.spell-card-mini:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.spell-card-disabled {
+  opacity: 0.6;
+  filter: grayscale(70%);
+}
+
+.spell-card-disabled:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.spell-cost-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #7c4dff;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 12px;
+  border: 1px solid #ffa726;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.spell-name-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px;
+  font-size: 10px;
+  text-align: center;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Targeting mode styling */
+.targeting-mode .board-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 90;
+  pointer-events: none;
+}
+
+.targeting-mode .square {
+  transition: all 0.2s;
+}
+
+.targeting-mode .square.valid-target {
+  box-shadow: inset 0 0 25px rgba(156, 77, 255, 0.8);
+  cursor: pointer;
+  transform: scale(1.05);
+  z-index: 91;
+}
+
+.targeting-mode .square:not(.valid-target) {
+  opacity: 0.7;
+}
+
+.targeting-mode .targeting-instruction {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  font-family: "MedievalSharp", cursive, serif;
+  text-shadow: 0 0 10px #000;
+  z-index: 95;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Active effects - move to top left */
+.active-effects {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  background-color: rgba(44, 22, 84, 0.85);
+  border-radius: 12px;
+  padding: 10px;
+  width: 190px;
+  z-index: 99; /* Below spell dashboard */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 2px solid #ffa726;
+  backdrop-filter: blur(3px);
+}
+
+.active-effects-header {
+  font-family: "MedievalSharp", cursive, serif;
+  color: #ffd54f;
+  font-size: 16px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 167, 38, 0.3);
+}
+
+.effect-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.effect-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.effect-icon {
+  font-size: 18px;
+  margin-right: 10px;
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.effect-details {
+  flex: 1;
+}
+
+.effect-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #e0e0e0;
+}
+
+.effect-description {
+  font-size: 10px;
+  color: #aaa;
+}
+
+.effect-turns {
+  font-size: 10px;
+  color: #9c4dff;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+/* Spell effect animation */
+.spell-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 36px;
+  z-index: 95;
+  animation: spellCastEffect 1.5s forwards;
+  pointer-events: none;
+}
+
+@keyframes spellCastEffect {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1.3) rotate(5deg);
+  }
+  30% {
+    transform: scale(1.1) rotate(0deg);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2) rotate(10deg);
+  }
+}
+
+/* Mana regeneration animation */
+.mana-regen-animation {
+  position: absolute;
+  bottom: 12px;
+  left: 55px;
+  color: #9c4dff;
+  font-size: 16px;
+  font-weight: bold;
+  animation: manaRegen 1.5s forwards;
+  pointer-events: none;
+}
+
+@keyframes manaRegen {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+/* Make the notification stand out more */
+#spell-notification {
+  background-color: rgba(44, 22, 84, 0.95) !important;
+  border: 2px solid #ffa726 !important;
+  font-size: 16px !important;
+  padding: 12px 25px !important;
+  box-shadow: 0 0 20px rgba(156, 77, 255, 0.6) !important;
+  transition: opacity 0.5s !important;
+}

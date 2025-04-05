@@ -267,17 +267,22 @@ class SpellSelection {
       setTimeout(() => {
         modal.style.display = "none";
         modal.style.opacity = 1;
+
+        // Show the game container
+        const gameContainer = document.getElementById("game-container");
+        if (gameContainer) {
+          gameContainer.style.display = "block";
+        }
       }, 1000);
     }
 
-    // Store the selected spells in the game object for later use
+    // Store the selected spells and initialize spell manager
     if (this.game.setSelectedSpells) {
       this.game.setSelectedSpells(this.playerSpells, this.opponentSpells);
     } else {
       console.warn("Game object doesn't have setSelectedSpells method");
     }
 
-    // Trigger game start
     console.log("Spell selection complete. Starting game...");
   }
 
