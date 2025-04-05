@@ -69,6 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log(
       `Game started with player as ${playerColor === "w" ? "White" : "Black"}`
     );
+
+    // Start spell selection after a short delay to ensure game is initialized
+    setTimeout(function () {
+      const spellSelection = new SpellSelection(window.game);
+      spellSelection.init();
+    }, 200);
   });
 
   // Start local game (human vs human)
@@ -81,6 +87,12 @@ document.addEventListener("DOMContentLoaded", function () {
       window.game.setGameMode("local");
       window.game.resetGame();
     }
+
+    // Start spell selection after a short delay
+    setTimeout(function () {
+      const spellSelection = new SpellSelection(window.game);
+      spellSelection.init();
+    }, 200);
   });
 
   // Return to main menu from game
