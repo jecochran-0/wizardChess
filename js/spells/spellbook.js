@@ -91,4 +91,49 @@ const SpellLibrary = [
     icon: "💨",
     cardImage: "Chess_Spells/second_wind.png",
   },
+  {
+    id: "spirit_link",
+    name: "Spirit Link",
+    description:
+      "Link one major piece to equal value worth of pieces. If the linked piece is captured within 3 turns, the linked pieces die instead.",
+    manaCost: 5,
+    icon: "🔗",
+    cardImage: "Chess_Spells/Spirit_Link.png",
+  },
+  {
+    id: "pressure_field",
+    name: "Pressure Field",
+    description:
+      "For 2 turns, enemy pieces cannot end their move on any square adjacent to your Rooks.",
+    manaCost: 3,
+    icon: "🔲",
+    cardImage: "Chess_Spells/pressure_field.png",
+  },
+  {
+    id: "nullfield",
+    name: "Nullfield",
+    description:
+      "Cancel the effect of any active spell, including summons, glyphs, or altered piece states.",
+    manaCost: 5,
+    icon: "🚫",
+    cardImage: "Chess_Spells/nullfield.png",
+  },
+  {
+    id: "veil_of_shadows",
+    name: "Veil of Shadows",
+    description:
+      "Your half of the board becomes hidden from your opponent for 3 turns. They see only empty tiles.",
+    manaCost: 4,
+    icon: "🌫️",
+    cardImage: "Chess_Spells/veil_of_shadows.png",
+  },
+  {
+    id: "raise_bonewalker",
+    name: "Raise the Bonewalker",
+    description:
+      "Summon a Skeleton Pawn onto your back rank. If not captured within 6 turns, it automatically promotes to a Rook.",
+    manaCost: 6,
+    icon: "☠️",
+    cardImage: "Chess_Spells/raise_the_bonewalker.png",
+  },
 ];

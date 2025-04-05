@@ -514,4 +514,28 @@ class SpellManager {
       notification.style.opacity = "0";
     }, 3000);
   }
+
+  // Add this to the SpellManager class to handle the new spell types
+  castSpell(spellId) {
+    // Find the spell in the player's spells
+    const spell = this.playerSpells.find((spell) => spell.id === spellId);
+
+    if (!spell) {
+      console.error("Spell not found:", spellId);
+      return false;
+    }
+
+    // Check if player has enough mana
+    if (this.playerMana < spell.manaCost) {
+      this.showNotification("Not enough mana to cast " + spell.name);
+      return false;
+    }
+
+    // Enter targeting mode specific to the spell
+    this.enterTargetingMode(spell);
+    return true;
+  }
+
+  // Update handling for the new spell types in the appropriate methods
+  // ...
 }

@@ -4,10 +4,8 @@
 class SpellSelection {
   constructor(game) {
     this.game = game;
-    this.spellPool = [];
     this.playerSpells = [];
     this.opponentSpells = [];
-    this.currentSelector = "w"; // White selects first
     this.selectionComplete = false;
 
     // Determine player colors
@@ -16,9 +14,6 @@ class SpellSelection {
 
   // Initialize spell selection
   init() {
-    // Generate random spell pool (10 spells)
-    this.generateSpellPool();
-
     // Create modal if it doesn't exist
     this.createModal();
 
@@ -41,14 +36,6 @@ class SpellSelection {
     }
   }
 
-  // Generate random spell pool
-  generateSpellPool() {
-    // Shuffle the spell library and take 10 random spells
-    this.spellPool = [...SpellLibrary]
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 10);
-  }
-
   // Create the spell selection modal if it doesn't exist
   createModal() {
     if (document.getElementById("spell-selection-modal")) {
@@ -62,14 +49,9 @@ class SpellSelection {
 
     // Create modal content with new layout
     modal.innerHTML = `
-      <div class="turn-indicator">
-        Current Selector: 
-        <span id="current-selector" class="selector-white">White</span>
-      </div>
-      
       <div class="spell-selection-header">
         <h1>Choose Your Magical Spells</h1>
-        <p>Each player selects 5 spells to use during the game</p>
+        <p>Select 5 spells to use during the game</p>
       </div>
       
       <div class="selected-spells">
@@ -79,18 +61,24 @@ class SpellSelection {
         </div>
         
         <div class="opponent-selection">
-          <h3>Opponent's Spells: <span id="opponent-spell-count">0</span>/5</h3>
+          <h3>Opponent's Spells</h3>
           <div id="opponent-spell-list" class="spell-selection-list"></div>
         </div>
       </div>
       
       <div class="spell-pool" id="spell-pool">
-        <!-- Spells will be added here -->
+        <!-- All 15 spells will be added here -->
       </div>
+      
+      <button id="start-game-button" class="start-game-button" disabled>Start Game</button>
     `;
 
     // Append to body
     document.body.appendChild(modal);
+
+    // Add event listener to start button
+    const startButton = modal.querySelector("#start-game-button");
+    startButton.addEventListener("click", () => this.completeSelection());
   }
 
   // Show the modal and populate it
@@ -100,125 +88,110 @@ class SpellSelection {
 
     modal.style.display = "flex";
 
-    // Populate spell pool
+    // Populate spell pool with 10 randomly selected spells from the 15 available
     this.populateSpellPool();
-
-    // Check if computer should select first
-    this.checkComputerTurn();
   }
 
-  // Populate the spell pool with cards
+  // Populate the spell pool with 10 randomly selected spells from the 15 available
   populateSpellPool() {
     const poolElement = document.getElementById("spell-pool");
     if (!poolElement) return;
 
     poolElement.innerHTML = "";
 
-    this.spellPool.forEach((spell, index) => {
+    // Select 10 random spells from the library of 15
+    const randomSpells = [...SpellLibrary]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10);
+
+    // Display only the 10 randomly selected spells
+    randomSpells.forEach((spell, index) => {
       // Create spell card
       const card = document.createElement("div");
       card.className = "spell-card";
       card.dataset.spellId = spell.id;
       card.style.setProperty("--card-index", index);
 
-      // Create front and back of card
+      // Create front of card
       card.innerHTML = `
         <div class="spell-card-front" style="background-image: url('${
           spell.cardImage || "Chess_Spells/default_card.png"
         }')">
+          <div class="spell-selection-marker">✓</div>
           <div class="spell-card-info">
             <div class="spell-name">${spell.name}</div>
             <div class="spell-description">${spell.description}</div>
             <div class="spell-cost">${spell.manaCost} mana</div>
           </div>
         </div>
-        <div class="spell-card-back"></div>
       `;
 
-      // Add click handler
-      card.addEventListener("click", () => this.selectSpell(spell));
+      // Add click handler for direct selection
+      card.addEventListener("click", () =>
+        this.toggleSpellSelection(spell, card)
+      );
 
       poolElement.appendChild(card);
     });
+
+    // Update the header to clarify the selection process
+    const header = document.querySelector(".spell-selection-header p");
+    if (header) {
+      header.textContent = "Select 5 spells from the 10 available";
+    }
   }
 
-  // Handle spell selection
-  selectSpell(spell) {
+  // Toggle spell selection (select/deselect)
+  toggleSpellSelection(spell, card) {
     // Check if selection is already complete
     if (this.selectionComplete) return;
 
-    // Get the current player
-    const isPlayerSelector = this.currentSelector === this.playerColor;
+    const spellIndex = this.playerSpells.findIndex((s) => s.id === spell.id);
 
-    // Remove spell from the pool visually
-    const spellCards = document.querySelectorAll(".spell-card");
-    spellCards.forEach((card) => {
-      if (card.dataset.spellId === spell.id) {
-        card.style.opacity = "0.3";
-        card.style.pointerEvents = "none";
+    if (spellIndex === -1) {
+      // Not selected yet, try to select it
+      if (this.playerSpells.length < 5) {
+        // Add to selected spells
+        this.playerSpells.push(spell);
+        card.classList.add("selected");
+
+        // Update display
+        this.updateSelectionDisplay();
+
+        // Enable start button if we have 5 spells
+        if (this.playerSpells.length === 5) {
+          const startButton = document.getElementById("start-game-button");
+          if (startButton) startButton.disabled = false;
+        }
       }
-    });
-
-    // Add the spell to the appropriate list
-    if (isPlayerSelector) {
-      // Player is selecting
-      if (this.playerSpells.length >= 5) return; // Already selected 5 spells
-
-      this.playerSpells.push(spell);
-      this.updateSelectionDisplay("player", this.playerSpells);
     } else {
-      // Opponent is selecting
-      if (this.opponentSpells.length >= 5) return; // Already selected 5 spells
+      // Already selected, deselect it
+      this.playerSpells.splice(spellIndex, 1);
+      card.classList.remove("selected");
 
-      this.opponentSpells.push(spell);
-      this.updateSelectionDisplay("opponent", this.opponentSpells);
+      // Update display
+      this.updateSelectionDisplay();
+
+      // Disable start button if we have fewer than 5 spells
+      const startButton = document.getElementById("start-game-button");
+      if (startButton) startButton.disabled = true;
     }
-
-    // Switch the selector
-    this.switchSelector();
-
-    // Check if selection is complete
-    if (this.playerSpells.length >= 5 && this.opponentSpells.length >= 5) {
-      this.completeSelection();
-    }
-
-    // No need to add auto-select here - the switchSelector method will handle it
-  }
-
-  // Switch the current selector
-  switchSelector() {
-    this.currentSelector = this.currentSelector === "w" ? "b" : "w";
-
-    // Update the UI
-    const selectorElement = document.getElementById("current-selector");
-    if (selectorElement) {
-      if (this.currentSelector === "w") {
-        selectorElement.textContent = "White";
-        selectorElement.className = "selector-white";
-      } else {
-        selectorElement.textContent = "Black";
-        selectorElement.className = "selector-black";
-      }
-    }
-
-    // Check if it's computer's turn now
-    this.checkComputerTurn();
   }
 
   // Update the selection display
-  updateSelectionDisplay(player, spells) {
-    const listElement = document.getElementById(`${player}-spell-list`);
-    const countElement = document.getElementById(`${player}-spell-count`);
+  updateSelectionDisplay() {
+    const listElement = document.getElementById("player-spell-list");
+    const countElement = document.getElementById("player-spell-count");
 
     if (!listElement || !countElement) return;
 
     // Update count
-    countElement.textContent = spells.length;
+    countElement.textContent = this.playerSpells.length;
 
     // Update list
     listElement.innerHTML = "";
 
-    spells.forEach((spell) => {
+    this.playerSpells.forEach((spell) => {
       const spellItem = document.createElement("div");
       spellItem.className = "selected-spell-card";
       spellItem.style.backgroundImage = `url('${
@@ -232,73 +205,293 @@ class SpellSelection {
     });
   }
 
-  // Auto-select a spell for the computer
-  autoSelectComputerSpell() {
-    if (this.opponentSpells.length >= 5) return;
-
-    console.log("Computer selecting a spell...");
-
-    // Select a random spell from the pool that's not already selected
-    const availableSpells = this.spellPool.filter(
-      (spell) =>
-        !this.playerSpells.includes(spell) &&
-        !this.opponentSpells.includes(spell)
+  // Select opponent spells automatically
+  selectOpponentSpells() {
+    // Select balanced set of spells based on difficulty
+    const difficulty = parseInt(
+      document.getElementById("difficulty")?.value || "2"
     );
 
-    if (availableSpells.length > 0) {
-      const randomIndex = Math.floor(Math.random() * availableSpells.length);
-      const randomSpell = availableSpells[randomIndex];
+    // Clear current selection
+    this.opponentSpells = [];
 
-      // Short delay to make it feel like the computer is "thinking"
-      setTimeout(() => {
-        this.selectSpell(randomSpell);
-      }, 800);
+    // Select spells based on difficulty
+    switch (difficulty) {
+      case 4: // Archmage - optimized counters
+        this.selectOptimizedSpells();
+        break;
+      case 3: // Master - strategic counters
+        this.selectCounterSpells();
+        break;
+      case 2: // Adept - balanced approach
+        this.selectBalancedSpells();
+        break;
+      default: // Apprentice - random selection
+        this.selectRandomSpells();
     }
+
+    // Display opponent's spells
+    this.displayOpponentSpells();
+  }
+
+  // Display opponent's selected spells
+  displayOpponentSpells() {
+    const opponentList = document.getElementById("opponent-spell-list");
+    if (!opponentList) return;
+
+    // Show thinking animation
+    opponentList.innerHTML =
+      '<div class="opponent-thinking">Opponent choosing spells...</div>';
+
+    // After a delay, show the selected spells
+    setTimeout(() => {
+      opponentList.innerHTML = "";
+
+      this.opponentSpells.forEach((spell) => {
+        const spellItem = document.createElement("div");
+        spellItem.className = "selected-spell-card";
+        spellItem.style.backgroundImage = `url('${
+          spell.cardImage || "Chess_Spells/default_card.png"
+        }')`;
+
+        opponentList.appendChild(spellItem);
+      });
+    }, 1000);
+  }
+
+  // Select random spells for the opponent
+  selectRandomSpells() {
+    const availableSpells = [...SpellLibrary];
+    const shuffled = availableSpells.sort(() => 0.5 - Math.random());
+    this.opponentSpells = shuffled.slice(0, 5);
+  }
+
+  // Select balanced spells for the opponent
+  selectBalancedSpells() {
+    // Define categories of spells
+    const offensiveOptions = SpellLibrary.filter((spell) =>
+      [
+        "ember_crown",
+        "mistform_knight",
+        "cursed_glyph",
+        "second_wind",
+        "raise_bonewalker",
+      ].includes(spell.id)
+    );
+
+    const defensiveOptions = SpellLibrary.filter((spell) =>
+      [
+        "arcane_anchor",
+        "spirit_link",
+        "pressure_field",
+        "nullfield",
+        "veil_of_shadows",
+      ].includes(spell.id)
+    );
+
+    const utilityOptions = SpellLibrary.filter((spell) =>
+      [
+        "astral_swap",
+        "phantom_step",
+        "chrono_recall",
+        "kings_gambit",
+        "dark_conversion",
+      ].includes(spell.id)
+    );
+
+    // Shuffle each category
+    const shuffledOffensive = [...offensiveOptions].sort(
+      () => Math.random() - 0.5
+    );
+    const shuffledDefensive = [...defensiveOptions].sort(
+      () => Math.random() - 0.5
+    );
+    const shuffledUtility = [...utilityOptions].sort(() => Math.random() - 0.5);
+
+    // Take 2 offensive, 2 defensive, 1 utility
+    this.opponentSpells = [
+      ...shuffledOffensive.slice(0, 2),
+      ...shuffledDefensive.slice(0, 2),
+      ...shuffledUtility.slice(0, 1),
+    ];
+  }
+
+  // Select counter spells based on player's selection
+  selectCounterSpells() {
+    // Analyze player's spell choices and select appropriate counters
+    const hasPlayerOffensive = this.playerSpells.some((spell) =>
+      [
+        "ember_crown",
+        "mistform_knight",
+        "cursed_glyph",
+        "second_wind",
+        "raise_bonewalker",
+      ].includes(spell.id)
+    );
+
+    const hasPlayerDefensive = this.playerSpells.some((spell) =>
+      [
+        "arcane_anchor",
+        "spirit_link",
+        "pressure_field",
+        "nullfield",
+        "veil_of_shadows",
+      ].includes(spell.id)
+    );
+
+    // Initialize opponent spells array
+    this.opponentSpells = [];
+
+    // If player has offensive spells, add more defensive spells
+    if (hasPlayerOffensive) {
+      const defensiveOptions = SpellLibrary.filter((spell) =>
+        [
+          "arcane_anchor",
+          "spirit_link",
+          "pressure_field",
+          "nullfield",
+          "veil_of_shadows",
+        ].includes(spell.id)
+      );
+
+      const shuffled = [...defensiveOptions].sort(() => Math.random() - 0.5);
+      this.opponentSpells.push(...shuffled.slice(0, 3));
+    } else {
+      const offensiveOptions = SpellLibrary.filter((spell) =>
+        [
+          "ember_crown",
+          "mistform_knight",
+          "cursed_glyph",
+          "second_wind",
+          "raise_bonewalker",
+        ].includes(spell.id)
+      );
+
+      const shuffled = [...offensiveOptions].sort(() => Math.random() - 0.5);
+      this.opponentSpells.push(...shuffled.slice(0, 3));
+    }
+
+    // If player has defensive spells, add spells that counter defense
+    if (hasPlayerDefensive) {
+      const counterDefense = SpellLibrary.filter((spell) =>
+        [
+          "phantom_step",
+          "nullfield",
+          "second_wind",
+          "veil_of_shadows",
+        ].includes(spell.id)
+      );
+
+      const shuffled = [...counterDefense].sort(() => Math.random() - 0.5);
+      this.opponentSpells.push(...shuffled.slice(0, 2));
+    } else {
+      const utilityOptions = SpellLibrary.filter((spell) =>
+        [
+          "astral_swap",
+          "kings_gambit",
+          "chrono_recall",
+          "dark_conversion",
+        ].includes(spell.id)
+      );
+
+      const shuffled = [...utilityOptions].sort(() => Math.random() - 0.5);
+      this.opponentSpells.push(...shuffled.slice(0, 2));
+    }
+
+    // Ensure we have exactly 5 spells
+    if (this.opponentSpells.length > 5) {
+      this.opponentSpells = this.opponentSpells.slice(0, 5);
+    } else if (this.opponentSpells.length < 5) {
+      // Fill with random spells
+      const remainingSpells = SpellLibrary.filter(
+        (spell) => !this.opponentSpells.includes(spell)
+      );
+
+      const shuffled = [...remainingSpells].sort(() => Math.random() - 0.5);
+
+      while (this.opponentSpells.length < 5) {
+        this.opponentSpells.push(shuffled.pop());
+      }
+    }
+  }
+
+  // Select optimized spell set for hardest difficulty
+  selectOptimizedSpells() {
+    // Strong spell combinations that work well together
+    const strongSets = [
+      // Aggressive set
+      SpellLibrary.filter((spell) =>
+        [
+          "ember_crown",
+          "second_wind",
+          "cursed_glyph",
+          "mistform_knight",
+          "phantom_step",
+        ].includes(spell.id)
+      ),
+
+      // Defensive set
+      SpellLibrary.filter((spell) =>
+        [
+          "arcane_anchor",
+          "nullfield",
+          "pressure_field",
+          "veil_of_shadows",
+          "spirit_link",
+        ].includes(spell.id)
+      ),
+
+      // Balanced set
+      SpellLibrary.filter((spell) =>
+        [
+          "astral_swap",
+          "ember_crown",
+          "nullfield",
+          "arcane_anchor",
+          "raise_bonewalker",
+        ].includes(spell.id)
+      ),
+    ];
+
+    // Pick one of the strong sets randomly
+    const selectedSet =
+      strongSets[Math.floor(Math.random() * strongSets.length)];
+    this.opponentSpells = selectedSet;
   }
 
   // Complete the selection phase
   completeSelection() {
     this.selectionComplete = true;
 
-    // Hide the modal with a transition
-    const modal = document.getElementById("spell-selection-modal");
-    if (modal) {
-      modal.style.opacity = 0;
-      setTimeout(() => {
-        modal.style.display = "none";
-        modal.style.opacity = 1;
+    // Select opponent spells
+    this.selectOpponentSpells();
 
-        // Show the game container
-        const gameContainer = document.getElementById("game-container");
-        if (gameContainer) {
-          gameContainer.style.display = "block";
-        }
-      }, 1000);
-    }
+    // After showing opponent spells, close the modal and start the game
+    setTimeout(() => {
+      // Hide the modal with a transition
+      const modal = document.getElementById("spell-selection-modal");
+      if (modal) {
+        modal.style.opacity = 0;
+        setTimeout(() => {
+          modal.style.display = "none";
+          modal.style.opacity = 1;
 
-    // Store the selected spells and initialize spell manager
-    if (this.game.setSelectedSpells) {
-      this.game.setSelectedSpells(this.playerSpells, this.opponentSpells);
-    } else {
-      console.warn("Game object doesn't have setSelectedSpells method");
-    }
-
-    console.log("Spell selection complete. Starting game...");
-  }
-
-  // Add a new method to check if it's computer's turn
-  checkComputerTurn() {
-    // Only auto-select if it's computer mode and it's the computer's turn
-    if (this.game.gameMode === "computer") {
-      // In computer mode, check whose turn it is based on colors
-      const isPlayerTurn = this.currentSelector === this.playerColor;
-
-      if (!isPlayerTurn) {
-        console.log("Computer's turn to select a spell");
-        this.autoSelectComputerSpell();
-      } else {
-        console.log("Player's turn to select a spell");
+          // Show the game container
+          const gameContainer = document.getElementById("game-container");
+          if (gameContainer) {
+            gameContainer.style.display = "block";
+          }
+        }, 1000);
       }
-    }
+
+      // Store the selected spells and initialize spell manager
+      if (this.game.setSelectedSpells) {
+        this.game.setSelectedSpells(this.playerSpells, this.opponentSpells);
+      } else {
+        console.warn("Game object doesn't have setSelectedSpells method");
+      }
+
+      console.log("Spell selection complete. Starting game...");
+    }, 1500);
   }
 }
