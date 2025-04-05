@@ -171,3 +171,70 @@ document.addEventListener("DOMContentLoaded", function () {
   createSparkles();
   setTimeout(refreshSparkles, 5000);
 });
+
+// Create a new file menu.js to be included after game.js but before the game is initialized
+// This injects the missing methods without modifying the original code
+
+// Wait for the DOM and the game script to load
+document.addEventListener("DOMContentLoaded", function () {
+  // Check if the game object is being created
+  const originalWizardChess = window.WizardChess;
+
+  // Define WizardChess constructor with the missing method
+  window.WizardChess = function () {
+    // Add the missing createBoard method
+    this.createBoard = function () {
+      console.log("Creating board");
+      if (this.board) {
+        this.board.init();
+      }
+    };
+
+    // Call the original constructor
+    return originalWizardChess.apply(this, arguments);
+  };
+
+  // Copy prototype methods
+  window.WizardChess.prototype = originalWizardChess.prototype;
+
+  console.log("Menu script loaded, added missing methods");
+});
+
+// Fix initialization errors by adding the missing methods after game is created
+function fixGameInitialization() {
+  // Check if game exists
+  if (window.game) {
+    // Add createBoard method only if it doesn't exist
+    if (!window.game.createBoard) {
+      window.game.createBoard = function () {
+        console.log("Using patched createBoard method");
+        // The board is already created in constructor, just initialize it
+        if (this.board && typeof this.board.init === "function") {
+          this.board.init();
+        }
+      };
+      console.log("Added missing createBoard method to game instance");
+    }
+    return true; // Indicate success
+  }
+  return false; // Indicate game not ready yet
+}
+
+// Run the fix function when document is loaded
+document.addEventListener("DOMContentLoaded", function () {
+  // Add a small delay to ensure all scripts are loaded
+  setTimeout(function () {
+    // Try to fix the game
+    const success = fixGameInitialization();
+
+    if (!success) {
+      // If not successful on first try, set up an interval to keep trying
+      const fixInterval = setInterval(function () {
+        if (fixGameInitialization()) {
+          clearInterval(fixInterval);
+          console.log("Game initialization fixed successfully");
+        }
+      }, 100); // Try every 100ms
+    }
+  }, 500); // Initial delay of 500ms to ensure scripts are loaded
+});
