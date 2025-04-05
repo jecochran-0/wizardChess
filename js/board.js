@@ -168,8 +168,12 @@ class ChessBoard {
         // Log move flags to debug promotion detection
         console.log("Move flags:", move.flags);
 
-        // Check if it's a pawn promotion
-        if (move.flags && move.flags.includes("p")) {
+        // FIXED: Check if it's a pawn promotion by verifying BOTH the move flag AND that it's a pawn
+        if (
+          move.flags &&
+          move.flags.includes("p") &&
+          this.isPromotionMove(move.from, move.to)
+        ) {
           console.log("Promotion move detected!");
           this.showPromotionDialog(move);
         } else {
@@ -404,39 +408,48 @@ class ChessBoard {
     console.log("NEW Promotion dialog created and should be visible now");
   }
 
-  // Improved completePromotion method
+  // Fix the completePromotion method to properly handle promotions and reset state
   completePromotion(promotionPiece) {
-    console.log("Completing promotion with piece:", promotionPiece);
+    console.log("Promotion piece clicked:", promotionPiece);
 
     if (!this.pendingPromotion) {
       console.error("No pending promotion!");
       return;
     }
 
-    const move = { ...this.pendingPromotion }; // Create a copy to avoid reference issues
+    // Create a copy of the pending promotion move
+    const move = { ...this.pendingPromotion };
     move.promotion = promotionPiece;
 
-    // Remove the dialog first
+    // Hide (not remove) the promotion dialog
     const promotionDialog = document.getElementById("promotion-selection");
     if (promotionDialog) {
-      promotionDialog.remove();
+      promotionDialog.classList.add("hidden");
     }
 
-    // Clear pending state
+    // Reset all promotion-related state
     this.pendingPromotion = null;
+    this.promotionInProgress = false;
+    this.promotionMove = null;
 
-    // Make the move immediately (no timeout)
+    // Make the move immediately
     console.log("Executing promotion move:", move);
-    this.game.chess.move({
+    const result = this.game.chess.move({
       from: move.from,
       to: move.to,
       promotion: move.promotion,
     });
 
-    // Update the board after the move
+    // Update the board display
     this.render();
     this.updateCapturedPieces();
     this.updateMoveHistory();
+
+    // Reset any remaining selection state
+    this.selectedSquare = null;
+    this.possibleMoves = [];
+    this.clearSelection();
+    this.clearAllIndicators();
 
     // If it's the computer's turn, let them move
     if (!this.game.isPlayerTurn()) {
@@ -444,6 +457,8 @@ class ChessBoard {
         this.game.makeBotMove();
       }, 500);
     }
+
+    return result;
   }
 
   // Simplified animateMove method that doesn't rely on promises
@@ -888,6 +903,29 @@ class ChessBoard {
     document.querySelectorAll(`.${oppositeClass}`).forEach((square) => {
       square.classList.remove(oppositeClass);
     });
+  }
+
+  // Fix the isPromotionMove function to correctly identify only pawn promotions
+  isPromotionMove(from, to) {
+    // First, get the piece at the "from" position
+    const piece = this.game.getPiece(from);
+
+    // IMPORTANT: Only pawns can be promoted
+    // Check if the piece exists and is actually a pawn
+    if (!piece || piece.type !== "p") {
+      return false;
+    }
+
+    // Convert positions to row/col
+    const fromRow = this.positionToRowCol(from)[0];
+    const toRow = this.positionToRowCol(to)[0];
+
+    // For white pawns, check if moving to the top row (row 0)
+    // For black pawns, check if moving to the bottom row (row 7)
+    return (
+      (piece.color === "w" && toRow === 0) ||
+      (piece.color === "b" && toRow === 7)
+    );
   }
 }
 
