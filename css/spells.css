@@ -238,20 +238,22 @@
 
 /* Redesigned Vertical Spell Dashboard */
 .spell-dashboard {
-  position: absolute;
+  position: fixed;
   left: 50px;
   top: 50%;
   transform: translateY(-50%);
   background-color: rgba(44, 22, 84, 0.9);
   border-radius: 12px;
-  padding: 15px 15px 15px 15px;
+  padding: 20px 15px;
   color: white;
   z-index: 100;
-  width: 165px;
+  width: 170px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   border: 2px solid #ffa726;
   backdrop-filter: blur(3px);
   display: flex;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
 /* Container for spell cards */
@@ -261,13 +263,13 @@
 
 /* Vertical mana bar container */
 .mana-bar-vertical {
-  width: 20px;
-  height: 100%;
-  margin-left: 10px;
-  position: relative;
+  width: 25px;
+  margin-left: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  height: 100%;
 }
 
 /* Title */
@@ -281,10 +283,12 @@
 
 /* Vertical mana bar styling */
 .mana-bar-container {
-  width: 15px;
-  height: 200px;
+  width: 18px;
+  height: calc(100% - 80px);
+  min-height: 200px;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
+  margin: 15px 0;
   position: relative;
   overflow: hidden;
   border: 1px solid #7b5eb9;
@@ -300,18 +304,18 @@
 }
 
 .mana-value {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   color: #ffd54f;
-  margin-top: 10px;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+  font-family: "MedievalSharp", cursive, serif;
 }
 
 .mana-icon {
-  font-size: 22px;
-  margin-bottom: 5px;
+  font-size: 24px;
   color: #9c4dff;
   text-shadow: 0 0 8px #6200ea;
+  margin-bottom: 5px;
 }
 
 /* Vertical spell cards */
@@ -319,7 +323,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
+  padding-bottom: 10px;
 }
 
 .spell-card-mini {

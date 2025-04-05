@@ -28,9 +28,7 @@ body {
 
 .game-container {
   position: relative;
-  z-index: 1;
-  background-color: transparent;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   margin: 0;
   padding: 0;
@@ -47,7 +45,7 @@ body {
   background-image: url("../mainMenuBackground.png");
   background-size: cover;
   background-position: center;
-  opacity: 0.6; /* Darker background */
+  opacity: 0.5;
   z-index: 0;
 }
 
@@ -59,7 +57,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 1;
   pointer-events: none;
 }
@@ -79,39 +77,36 @@ h1 {
 
 .game-area {
   display: flex;
-  position: relative;
-  z-index: 10;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   width: 100%;
-  height: 100%;
+  position: relative;
 }
 
 /* Make sure the board is properly centered */
 .board-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
+  position: relative;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
 /* Move side panel completely to the right */
 .side-panel {
-  position: absolute;
+  position: fixed;
   top: 50px;
   right: 50px;
   width: 280px;
-  background-color: rgba(44, 22, 84, 0.85);
+  background-color: rgba(44, 22, 84, 0.9);
   border-radius: 12px;
-  padding: 15px;
+  padding: 20px;
   color: white;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   border: 2px solid #ffa726;
   backdrop-filter: blur(3px);
-  z-index: 10;
-  max-height: 80vh;
+  z-index: 20;
+  max-height: calc(100vh - 100px);
   overflow-y: auto;
 }
 
