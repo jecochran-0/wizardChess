@@ -144,9 +144,22 @@ class SpellSelection {
 
   // Handle spell selection
   selectSpell(spell) {
-    // Check if current selector is player
-    const isPlayerSelector = this.currentSelector === this.game.playerColor;
+    // Check if selection is already complete
+    if (this.selectionComplete) return;
 
+    // Get the current player
+    const isPlayerSelector = this.currentSelector === this.playerColor;
+
+    // Remove spell from the pool visually
+    const spellCards = document.querySelectorAll(".spell-card");
+    spellCards.forEach((card) => {
+      if (card.dataset.spellId === spell.id) {
+        card.style.opacity = "0.3";
+        card.style.pointerEvents = "none";
+      }
+    });
+
+    // Add the spell to the appropriate list
     if (isPlayerSelector) {
       // Player is selecting
       if (this.playerSpells.length >= 5) return; // Already selected 5 spells
@@ -161,16 +174,15 @@ class SpellSelection {
       this.updateSelectionDisplay("opponent", this.opponentSpells);
     }
 
-    // Switch selector
+    // Switch the selector
     this.switchSelector();
 
     // Check if selection is complete
     if (this.playerSpells.length >= 5 && this.opponentSpells.length >= 5) {
       this.completeSelection();
-    } else if (!isPlayerSelector && this.game.gameMode === "computer") {
-      // If it's now computer's turn again, auto-select
-      this.autoSelectComputerSpell();
     }
+
+    // No need to add auto-select here - the switchSelector method will handle it
   }
 
   // Switch the current selector
@@ -271,11 +283,16 @@ class SpellSelection {
 
   // Add a new method to check if it's computer's turn
   checkComputerTurn() {
-    // If computer mode and it's computer's turn to select
+    // Only auto-select if it's computer mode and it's the computer's turn
     if (this.game.gameMode === "computer") {
-      const isComputerTurn = this.currentSelector !== this.playerColor;
-      if (isComputerTurn) {
+      // In computer mode, check whose turn it is based on colors
+      const isPlayerTurn = this.currentSelector === this.playerColor;
+
+      if (!isPlayerTurn) {
+        console.log("Computer's turn to select a spell");
         this.autoSelectComputerSpell();
+      } else {
+        console.log("Player's turn to select a spell");
       }
     }
   }
